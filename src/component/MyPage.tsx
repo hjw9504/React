@@ -5,13 +5,14 @@ import { Navigate } from "react-router-dom";
 export default function MyPage() {
   const [isLogin, setIsLogin] = useState(false);
   const [data, setData] = useState(null);
+  const [input, setInput] = useState("");
 
   useLayoutEffect(() => {
-    axios
-      .get("https://jsonplaceholder.typicode.com/todos/1")
-      .then((response) => {
-        setData(response.data);
-      });
+    fetch("https://jsonplaceholder.typicode.com/posts/1")
+    .then(response => response.json())
+    .then(response => {
+      setData(response);
+    })
 
       setIsLogin(true);
       console.log(isLogin);
@@ -23,18 +24,24 @@ export default function MyPage() {
   }, []);
 
   function onClick() {
-    axios
-      .get("https://jsonplaceholder.typicode.com/todos/2")
-      .then((response) => {
-        setData(response.data);
-      });
+    fetch(`https://jsonplaceholder.typicode.com/posts/${input}`)
+    .then(response => response.json())
+    .then(response => {
+      setData(response);
+    })
   }
   
   return (
     <div>
       <h1>MyPage</h1>
       <p>MyPage 페이지입니다.</p>
-
+      <div>
+        <input
+        value = {input}
+        onChange = {(e)=>{
+            setInput(e.target.value);
+        }}/>
+      </div>
       <div>
         <button onClick={onClick}>불러오기</button>
       </div>
