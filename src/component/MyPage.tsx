@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 export default function MyPage() {
@@ -16,19 +16,23 @@ export default function MyPage() {
 
       setIsLogin(true);
       console.log(isLogin);
-      // if (!isLogin) {
-      //   // return <Navigate to="/login" replace={true} />;
-      //   setIsLogin(true)
-      //   console.log(isLogin);
-      // }
   }, []);
 
-  function onClick() {
-    fetch(`https://jsonplaceholder.typicode.com/posts/${input}`)
-    .then(response => response.json())
-    .then(response => {
+  useEffect(() => {
+    // return <Navigate to="/login" replace={true} />;
+    setIsLogin(false);
+  })
+
+  async function onClick() {
+    try {
+      const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${input}`)
+      const response = await res.json();
       setData(response);
-    })
+      console.log(isLogin);
+    }
+    catch(err) {
+      console.log(err);
+    }
   }
   
   return (
@@ -48,7 +52,7 @@ export default function MyPage() {
       {data && (
         <textarea
           rows={7}
-          value={JSON.stringify(data, null, 2)}
+          value={data['title']}
           readOnly={true}
         />
       )}
