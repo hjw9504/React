@@ -18,13 +18,10 @@ export default function MyPage() {
     console.log("useLayoutEffect: ", isLogin);
   }, []);
 
-  useEffect(() => {
-    checkLogin();
-  });
+  useEffect(() => {});
 
   const checkLogin = () => {
     console.log("Login: ", isLogin);
-    console.log("Input: ", input);
     if (input === "5") {
       setIsLogin(false);
     }
@@ -32,17 +29,17 @@ export default function MyPage() {
 
   const onClick = async () => {
     try {
-      const res = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${input}`
-      );
-      const response = await res.json();
-      await onHandleData(response);
+      await fetch(`https://jsonplaceholder.typicode.com/posts/${input}`)
+        .then((res) => res.json())
+        .then((res) => onHandleData(res));
+
+      checkLogin();
     } catch (err) {
       console.log(err);
     }
   };
 
-  const onHandleData = async (response: any) => {
+  const onHandleData = (response: any) => {
     setData(response);
   };
 
