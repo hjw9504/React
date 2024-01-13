@@ -1,46 +1,25 @@
-import {useEffect, useState} from "react";
-import {Navigate, useNavigate} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
+import {Button} from "@material-tailwind/react";
+import {useEffect, useLayoutEffect, useState} from "react";
 
-export default function Login() {
-  const [data, setData] = useState(false);
-  const [userToken, setUserToken] = useState(null);
+export default function Home() {
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {});
+  useLayoutEffect(() => {}, []);
+
+  useEffect(() => {
+    console.log(
+      "ID: " + userId + " PW: " + userPw + " Name: " + name + " Email: " + email
+    );
+  });
 
   const onHandleData = (response: any) => {
-    console.log("Login Success: ", response);
-    setData(response);
-    setUserToken(response["token"]);
-    navigate("/mypage");
-  };
-
-  const onSignIn = async () => {
-    try {
-      const data = {
-        userId: userId,
-        userPw: userPw,
-      };
-      await fetch(`/user/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.userId) {
-            onHandleData(res);
-          } else {
-            alert("Login Fail");
-          }
-        });
-    } catch (err) {
-      console.log(err);
-    }
+    alert("Register Success!");
+    navigate("/login");
   };
 
   const saveUserId = (event: any) => {
@@ -49,6 +28,40 @@ export default function Login() {
 
   const saveUserPw = (event: any) => {
     setUserPw(event.target.value);
+  };
+
+  const saveName = (event: any) => {
+    setName(event.target.value);
+  };
+
+  const saveEmail = (event: any) => {
+    setEmail(event.target.value);
+  };
+
+  const onSignUp = async () => {
+    try {
+      const data = {
+        userId: userId,
+        userPw: userPw,
+        name: name,
+        email: email,
+      };
+      await fetch(`/user/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }).then((res) => {
+        if (res.status === 200) {
+          onHandleData(res);
+        } else {
+          alert("Register Fail");
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -69,7 +82,7 @@ export default function Login() {
             alt="Your Company"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign In
+            Register
           </h2>
         </div>
 
@@ -101,16 +114,8 @@ export default function Login() {
               >
                 Password
               </label>
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
-                  Forgot password?
-                </a>
-              </div>
             </div>
-            <div className="mt-2 my-5">
+            <div className="mt-2 my-2">
               <input
                 id="password"
                 name="password"
@@ -124,23 +129,57 @@ export default function Login() {
           </div>
 
           <div>
-            <button
-              onClick={onSignIn}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Sign in
-            </button>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Name
+              </label>
+            </div>
+            <div className="mt-2 my-2">
+              <input
+                id="name"
+                name="name"
+                onChange={saveName}
+                type="text"
+                required
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
           </div>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{" "}
-            <a
-              href="/register"
-              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Email
+              </label>
+            </div>
+            <div className="mt-2 my-5">
+              <input
+                id="email"
+                name="email"
+                onChange={saveEmail}
+                type="email"
+                autoComplete="email"
+                required
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              onClick={onSignUp}
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Register
-            </a>
-          </p>
+            </button>
+          </div>
         </div>
       </div>
     </>

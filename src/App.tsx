@@ -5,14 +5,14 @@ import Login from "./component/Login";
 import Index from "./component/Index";
 import MyPage from "./component/MyPage";
 import Error from "./component/Error";
-import SignUp from "./component/SignUp";
+import Register from "./component/Register";
 
 function App() {
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/index" element={<Index />}>
           <Route path=":id" element={<Index />} />
         </Route>
