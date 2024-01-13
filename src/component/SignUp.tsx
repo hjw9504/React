@@ -3,17 +3,13 @@ import {Button} from "@material-tailwind/react";
 import {useEffect, useLayoutEffect, useState} from "react";
 
 export default function Home() {
-  const [isLogin, setIsLogin] = useState(false);
-
-  useLayoutEffect(() => {
-    console.log("useLayoutEffect: ", isLogin);
-  }, []);
+  useLayoutEffect(() => {}, []);
 
   useEffect(() => {});
 
   return (
-    <div className="Home">
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+    <div className="SignUp">
+      <h1 className="text-3xl font-bold underline">Sign Up</h1>
     </div>
   );
 }
