@@ -1,11 +1,12 @@
 import axios from "axios";
 import {useEffect, useLayoutEffect, useState} from "react";
-import {Navigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 
 export default function MyPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [data, setData] = useState(null);
   const [input, setInput] = useState("");
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/posts/1")
@@ -24,6 +25,7 @@ export default function MyPage() {
     console.log("Login: ", isLogin);
     if (input === "5") {
       setIsLogin(false);
+      navigate("login");
     }
   };
 
@@ -42,10 +44,6 @@ export default function MyPage() {
   const onHandleData = (response: any) => {
     setData(response);
   };
-
-  if (!isLogin) {
-    return <Navigate to="/login" replace={true} />;
-  }
 
   return (
     <div>

@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
+import cookie from "react-cookies";
 
 export default function Login() {
   const [data, setData] = useState(false);
@@ -13,8 +14,19 @@ export default function Login() {
   const onHandleData = (response: any) => {
     console.log("Login Success: ", response);
     setData(response);
-    setUserToken(response["token"]);
+    setCookie(response["token"]);
     navigate("/mypage");
+  };
+
+  const setCookie = (userToken: String) => {
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 60);
+    cookie.save("token", userToken, {
+      path: "/",
+      expires,
+      // secure : true,
+      // httpOnly : true
+    });
   };
 
   const onSignIn = async () => {
