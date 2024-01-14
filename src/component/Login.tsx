@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import cookie from "react-cookies";
 
@@ -9,7 +9,15 @@ export default function Login() {
   const [userPw, setUserPw] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {});
+  useLayoutEffect(() => {}, []);
+
+  useEffect(() => {
+    // check login
+    const token = cookie.load("token");
+    if (token !== undefined) {
+      navigate("/mypage");
+    }
+  });
 
   const onHandleData = (response: any) => {
     console.log("Login Success: ", response);

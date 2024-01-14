@@ -11,11 +11,7 @@ export default function Home() {
 
   useLayoutEffect(() => {}, []);
 
-  useEffect(() => {
-    console.log(
-      "ID: " + userId + " PW: " + userPw + " Name: " + name + " Email: " + email
-    );
-  });
+  useEffect(() => {});
 
   const onHandleData = (response: any) => {
     alert("Register Success!");
