@@ -22,14 +22,15 @@ export default function Login() {
   const onHandleData = (response: any) => {
     console.log("Login Success: ", response);
     setData(response);
-    setCookie(response["token"]);
+    setCookie("token", response["token"]);
+    setCookie("name", response["name"]);
     navigate("/mypage");
   };
 
-  const setCookie = (userToken: String) => {
+  const setCookie = (cookieName: string, cookieValue: String) => {
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 60);
-    cookie.save("token", userToken, {
+    cookie.save(cookieName, cookieValue, {
       path: "/",
       expires,
       // secure : true,

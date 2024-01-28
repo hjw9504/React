@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import {Dialog} from "@headlessui/react";
 import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
 import cookie from "react-cookies";
@@ -12,8 +12,13 @@ const navigation = [
 
 export default function MyPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [name, setName] = useState("");
 
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    setName(cookie.load("name"));
+  }, []);
 
   useEffect(() => {
     checkLogin();
@@ -28,6 +33,7 @@ export default function MyPage() {
 
   const logout = () => {
     cookie.remove("token");
+    cookie.remove("name");
     navigate("/login");
   };
 
@@ -70,6 +76,7 @@ export default function MyPage() {
             ))}
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+            <div className="mr-5 font-bold">Hello {name}</div>
             <a
               href="/login"
               onClick={logout}
