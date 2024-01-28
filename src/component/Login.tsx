@@ -63,6 +63,10 @@ export default function Login() {
     }
   };
 
+  const resetPassword = () => {
+    navigate("/reset/password");
+  };
+
   const saveUserId = (event: any) => {
     setUserId(event.target.value);
   };
@@ -123,10 +127,11 @@ export default function Login() {
               </label>
               <div className="text-sm">
                 <a
-                  href="#"
+                  href=""
+                  onClick={resetPassword}
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
-                  Forgot password?
+                  Change password?
                 </a>
               </div>
             </div>

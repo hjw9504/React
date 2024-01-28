@@ -7,6 +7,7 @@ import MyPage from "./component/Test";
 import Error from "./component/Error";
 import Register from "./component/Register";
 import Test from "./component/MyPage";
+import ResetPassword from "./component/ResetPassword";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path=":id" element={<Index />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/reset/password" element={<ResetPassword />} />
         <Route path="/mypage" element={<Test />} />
         <Route path="/test" element={<MyPage />} />
         <Route path="/*" element={<Error />} />
