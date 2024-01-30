@@ -60,6 +60,11 @@ export default function Home() {
 
   const onSignUp = async () => {
     try {
+      if (!isChecked) {
+        alert("Check User Id");
+        return;
+      }
+
       const data = {
         userId: userId,
         userPw: userPw,
