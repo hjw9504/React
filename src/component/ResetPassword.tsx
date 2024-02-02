@@ -44,7 +44,7 @@ export default function Home() {
     })
       .then((res) => res.json())
       .then((res) => {
-        if (res) {
+        if (res.resultData) {
           setIsExist(true);
         } else {
           setUserId("");
@@ -71,13 +71,16 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }).then((res) => {
-        if (res.status === 200) {
-          navigate("/login");
-        } else {
-          alert("Register Fail");
-        }
-      });
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.resultData === "success") {
+            alert("Password Changed!");
+            navigate("/login");
+          } else {
+            alert("Register Fail");
+          }
+        });
     } catch (err) {
       console.log(err);
     }

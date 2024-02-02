@@ -53,7 +53,7 @@ export default function Login() {
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.userId) {
+          if (res.errorCode === 200) {
             onHandleData(res);
           } else {
             alert("Login Fail");

@@ -59,8 +59,7 @@ export default function UserInfo() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
-        setUser(res);
+        setUser(res.resultData);
       });
   };
 

@@ -49,7 +49,8 @@ export default function Home() {
     })
       .then((res) => res.json())
       .then((res) => {
-        if (res) {
+        console.log(res);
+        if (res.resultData) {
           alert("Already Exist UserId");
           setUserId("");
         } else {
@@ -77,13 +78,15 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }).then((res) => {
-        if (res.status === 200) {
-          onHandleData(res);
-        } else {
-          alert("Register Fail");
-        }
-      });
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.resultData === "success") {
+            onHandleData(res);
+          } else {
+            alert("Register Fail");
+          }
+        });
     } catch (err) {
       console.log(err);
     }
