@@ -24,6 +24,7 @@ export default function Login() {
     setData(response);
     setCookie("token", response["token"]);
     setCookie("name", response["name"]);
+    setCookie("memberId", response["memberId"]);
     navigate("/mypage");
   };
 
@@ -54,7 +55,7 @@ export default function Login() {
         .then((res) => res.json())
         .then((res) => {
           if (res.errorCode === 200) {
-            onHandleData(res);
+            onHandleData(res.resultData);
           } else {
             alert("Login Fail");
           }

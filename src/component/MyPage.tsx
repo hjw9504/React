@@ -17,17 +17,6 @@ export default function MyPage() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkLogin();
-  });
-
-  const checkLogin = () => {
-    const token = cookie.load("token");
-    if (token === undefined) {
-      navigate("/login");
-    }
-  };
-
   const logout = () => {
     cookie.remove("token");
     cookie.remove("name");

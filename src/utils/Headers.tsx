@@ -1,14 +1,14 @@
 import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
 import {Dialog} from "@headlessui/react";
-import {useLayoutEffect, useState} from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import cookie from "react-cookies";
 
 const Headers = () => {
   const navigation = [
-    {name: "Main", href: "/"},
-    {name: "MyPage", href: "/mypage"},
+    {name: "Main", href: "/mypage"},
     {name: "User", href: "/user"},
+    {name: "Talking", href: "/post"},
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,6 +18,17 @@ const Headers = () => {
   useLayoutEffect(() => {
     setName(cookie.load("name"));
   }, []);
+
+  useEffect(() => {
+    checkLogin();
+  });
+
+  const checkLogin = () => {
+    const token = cookie.load("token");
+    if (token === undefined) {
+      navigate("/login");
+    }
+  };
 
   const logout = () => {
     cookie.remove("token");

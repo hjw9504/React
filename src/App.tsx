@@ -8,6 +8,8 @@ import Error from "./component/Error";
 import Register from "./component/Register";
 import Test from "./component/MyPage";
 import ResetPassword from "./component/ResetPassword";
+import Post from "./component/Post";
+import PostDetail from "./component/PostDetail";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/reset/password" element={<ResetPassword />} />
         <Route path="/mypage" element={<Test />} />
         <Route path="/test" element={<MyPage />} />
+        <Route path="/post" element={<Post />} />
+        <Route path="/post/detail/:postingId" element={<PostDetail />} />
         <Route path="/*" element={<Error />} />
       </Routes>
     </div>
