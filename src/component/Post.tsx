@@ -11,7 +11,7 @@ const navigation = [
   {name: "Index", href: "/index"},
 ];
 
-export default function UserInfo() {
+export default function Post() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [memberId, setMemberId] = useState("");
   const [token, setToken] = useState("");
