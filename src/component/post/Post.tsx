@@ -62,7 +62,7 @@ export default function Post() {
           {user.map((user) => (
             <li
               key={user.id}
-              className="flex justify-between gap-x-6 py-5"
+              className="flex justify-between gap-x-6 py-5 hover:bg-sky-50"
               onClick={getPostingDetail}
               value={user.id}
             >
