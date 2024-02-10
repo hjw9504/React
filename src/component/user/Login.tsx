@@ -25,6 +25,7 @@ export default function Login() {
     setCookie("token", response["token"]);
     setCookie("name", response["name"]);
     setCookie("memberId", response["memberId"]);
+    setCookie("role", response["role"]);
     navigate("/mypage");
   };
 

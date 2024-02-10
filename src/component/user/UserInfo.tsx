@@ -70,7 +70,10 @@ export default function UserInfo() {
       <div>
         <ul role="list" className="divide-y divide-gray-100">
           {user.map((user) => (
-            <li key={user.userId} className="flex justify-between gap-x-6 py-5">
+            <li
+              key={user.userId}
+              className="flex justify-between gap-x-6 py-5 hover:bg-sky-50"
+            >
               <div className="flex min-w-0 gap-x-4">
                 {/* <img
                   className="h-12 w-12 flex-none rounded-full bg-gray-50"

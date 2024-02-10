@@ -5,18 +5,28 @@ import {useNavigate} from "react-router-dom";
 import cookie from "react-cookies";
 
 const Headers = () => {
-  const navigation = [
+  const userNavigation = [
+    {name: "Main", href: "/mypage"},
+    {name: "Post", href: "/post"},
+  ];
+
+  const adminNavigation = [
     {name: "Main", href: "/mypage"},
     {name: "User", href: "/user"},
-    {name: "Talking", href: "/post"},
+    {name: "Post", href: "/post"},
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [name, setName] = useState("");
+  const [navigation, setNavigation] = useState(userNavigation);
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
     setName(cookie.load("name"));
+
+    if (cookie.load("role") === "ADMIN") {
+      setNavigation(adminNavigation);
+    }
   }, []);
 
   useEffect(() => {
@@ -33,6 +43,8 @@ const Headers = () => {
   const logout = () => {
     cookie.remove("token");
     cookie.remove("name");
+    cookie.remove("memberId");
+    cookie.remove("role");
     navigate("/login");
   };
 
