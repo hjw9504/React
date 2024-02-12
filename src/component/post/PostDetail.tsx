@@ -7,6 +7,7 @@ import cookie from "react-cookies";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {Button} from "@material-tailwind/react";
+import Alert from "../utils/Alert";
 
 const modules = {
   toolbar: {
@@ -78,16 +79,31 @@ export default function PostDetail() {
   });
   const [postingId, setPostingId] = useState("");
   const [body, setBody] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isNotUser, setIsNotUser] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
+  useLayoutEffect(() => {
+    if (cookie.load("role") === "ADMIN") {
+      setIsAdmin(true);
+    }
+  });
+
   useEffect(() => {
     getPostingDetail();
-  }, []);
+
+    let timer = setTimeout(() => {
+      setIsNotUser(false);
+    }, 2000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isNotUser]);
 
   const onEditPost = () => {
-    if (post.memberId !== cookie.load("memberId")) {
-      alert("You can't edit this post!");
+    if (!isAdmin && post.memberId !== cookie.load("memberId")) {
+      setIsNotUser(true);
       return;
     }
     navigate(`/post/edit/${params.postingId}`);
@@ -110,7 +126,6 @@ export default function PostDetail() {
     )
       .then((res) => res.json())
       .then((res) => {
-        console.log(res.resultData);
         setPost(res.resultData);
       });
   };
@@ -154,6 +169,14 @@ export default function PostDetail() {
         </div>
         <div>
           <ReactQuill readOnly value={post.body} modules={modules} />
+        </div>
+        <div>
+          {isNotUser ? (
+            <Alert
+              alertMessage="You can't edit this post"
+              alertType="alert-error"
+            />
+          ) : null}
         </div>
         <div>
           <div className="flex justify-between pt-10">

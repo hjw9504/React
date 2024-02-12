@@ -6,6 +6,7 @@ import Headers from "../utils/Headers";
 import cookie from "react-cookies";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Alert from "../utils/Alert";
 
 const modules = {
   toolbar: {
@@ -78,13 +79,41 @@ export default function PostDetail() {
   const [postingId, setPostingId] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [isHover, setIsHover] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isNotUser, setIsNotUser] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
+  useLayoutEffect(() => {
+    if (cookie.load("role") === "ADMIN") {
+      setIsAdmin(true);
+    }
+  });
+
   useEffect(() => {
     getPostingDetail();
-  }, []);
+
+    if (showAlert) {
+      let showAlertTimer = setTimeout(() => {
+        setShowAlert(false);
+        navigate(`/post/detail/${params.postingId}`);
+      }, 1000);
+      return () => {
+        clearTimeout(showAlertTimer);
+      };
+    }
+
+    if (isNotUser) {
+      let isNotUserTimer = setTimeout(() => {
+        setIsNotUser(false);
+        navigate(`/post/detail/${params.postingId}`);
+      }, 1000);
+      return () => {
+        clearTimeout(isNotUserTimer);
+      };
+    }
+  }, [showAlert, isNotUser]);
 
   const getPostingDetail = async () => {
     await fetch(
@@ -114,6 +143,11 @@ export default function PostDetail() {
   };
 
   const onEditPost = async () => {
+    if (!isAdmin && cookie.load("memberId") !== post.memberId) {
+      setIsNotUser(true);
+      return;
+    }
+
     const data = {
       id: params.postingId,
       memberId: cookie.load("memberId"),
@@ -130,8 +164,7 @@ export default function PostDetail() {
     })
       .then((res) => res.json())
       .then((res) => {
-        alert("Success!");
-        navigate(`/post/detail/${params.postingId}`);
+        setShowAlert(true);
       });
   };
 
@@ -173,6 +206,19 @@ export default function PostDetail() {
         </div>
         <div>
           <ReactQuill value={body} onChange={onSavePost} modules={modules} />
+        </div>
+        <div>
+          {showAlert ? (
+            <Alert alertMessage="Success" alertType="alert-success" />
+          ) : null}
+        </div>
+        <div>
+          {isNotUser ? (
+            <Alert
+              alertMessage="You can't edit this post"
+              alertType="alert-error"
+            />
+          ) : null}
         </div>
         <div className="flex justify-end pt-5 mr-5">
           <svg

@@ -1,12 +1,14 @@
 import {useEffect, useLayoutEffect, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import cookie from "react-cookies";
+import Alert from "../utils/Alert";
 
 export default function Login() {
   const [data, setData] = useState(false);
   const [userToken, setUserToken] = useState(null);
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
+  const [isLoginFail, setIsLoginFail] = useState(false);
   const navigate = useNavigate();
 
   useLayoutEffect(() => {}, []);
@@ -17,7 +19,14 @@ export default function Login() {
     if (token !== undefined) {
       navigate("/mypage");
     }
-  });
+
+    let timer = setTimeout(() => {
+      setIsLoginFail(false);
+    }, 2000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isLoginFail]);
 
   const onHandleData = (response: any) => {
     console.log("Login Success: ", response);
@@ -58,7 +67,7 @@ export default function Login() {
           if (res.errorCode === 200) {
             onHandleData(res.resultData);
           } else {
-            alert("Login Fail");
+            setIsLoginFail(true);
           }
         });
     } catch (err) {
@@ -80,14 +89,6 @@ export default function Login() {
 
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
@@ -119,7 +120,6 @@ export default function Login() {
               />
             </div>
           </div>
-
           <div>
             <div className="flex items-center justify-between">
               <label
@@ -130,7 +130,7 @@ export default function Login() {
               </label>
               <div className="text-sm">
                 <a
-                  href=""
+                  href="/"
                   onClick={resetPassword}
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
@@ -150,7 +150,11 @@ export default function Login() {
               />
             </div>
           </div>
-
+          <div>
+            {isLoginFail === true ? (
+              <Alert alertMessage={"Login Fail"} />
+            ) : null}
+          </div>
           <div>
             <button
               onClick={onSignIn}
