@@ -7,6 +7,7 @@ import MyPage from "./component/Test";
 import Error from "./component/Error";
 import Register from "./component/user/Register";
 import Test from "./component/user/MyPage";
+import MyInfo from "./component/user/MyInfo";
 import ResetPassword from "./component/user/ResetPassword";
 import Post from "./component/post/Post";
 import PostDetail from "./component/post/PostDetail";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/reset/password" element={<ResetPassword />} />
         <Route path="/mypage" element={<Test />} />
+        <Route path="/myinfo" element={<MyInfo />} />
         <Route path="/test" element={<MyPage />} />
         <Route path="/post" element={<Post />} />
         <Route path="/post/detail/:postingId" element={<PostDetail />} />

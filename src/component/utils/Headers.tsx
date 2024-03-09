@@ -45,6 +45,7 @@ const Headers = () => {
     cookie.remove("name");
     cookie.remove("memberId");
     cookie.remove("role");
+    cookie.remove("userId");
     navigate("/login");
   };
 

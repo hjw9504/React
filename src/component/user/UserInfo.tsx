@@ -3,6 +3,7 @@ import {Dialog} from "@headlessui/react";
 import {useEffect, useLayoutEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import Headers from "../utils/Headers";
+import cookie from "react-cookies";
 
 const navigation = [
   {name: "Main", href: "/"},
@@ -51,10 +52,11 @@ export default function UserInfo() {
   }, []);
 
   const getUserInfo = async () => {
-    await fetch(`/user/info?id=ALL`, {
+    await fetch(`/user/info?id=ALL&memberId=${cookie.load("memberId")}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        token: cookie.load("token"),
       },
     })
       .then((res) => res.json())

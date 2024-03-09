@@ -85,17 +85,16 @@ export default function PostDetail() {
   const params = useParams();
 
   useLayoutEffect(() => {
+    getPostingDetail();
     if (cookie.load("role") === "ADMIN") {
       setIsAdmin(true);
     }
-  });
+  }, []);
 
   useEffect(() => {
-    getPostingDetail();
-
     let timer = setTimeout(() => {
       setIsNotUser(false);
-    }, 2000);
+    }, 1000);
     return () => {
       clearTimeout(timer);
     };

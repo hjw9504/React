@@ -33,6 +33,8 @@ const Headers = () => {
   const logout = () => {
     cookie.remove("token");
     cookie.remove("name");
+    cookie.remove("memberId");
+    cookie.remove("role");
     navigate("/login");
   };
 
