@@ -55,10 +55,16 @@ export default function Home() {
 
   const onResetPassword = async () => {
     try {
+      if (userId === "" || newPassword === "" || newPasswordCheck === "") {
+        alert("Input All Infos");
+        return;
+      }
+
       if (newPassword !== newPasswordCheck) {
         alert("Password is not equal! Check New Password");
         setNewPassword("");
         setNewPasswordCheck("");
+        return;
       }
 
       const data = {

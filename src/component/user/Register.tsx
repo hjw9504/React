@@ -61,6 +61,11 @@ export default function Home() {
 
   const onSignUp = async () => {
     try {
+      if (userId === "" || userPw === "" || name === "" || email === "") {
+        alert("Input All Infos");
+        return;
+      }
+
       if (!isChecked) {
         alert("Check User Id");
         return;

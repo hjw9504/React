@@ -131,7 +131,7 @@ export default function Login() {
               </label>
               <div className="text-sm">
                 <a
-                  href="/"
+                  href=""
                   onClick={resetPassword}
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >

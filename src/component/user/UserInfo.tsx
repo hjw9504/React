@@ -11,27 +11,6 @@ const navigation = [
   {name: "Index", href: "/index"},
 ];
 
-const people = [
-  {
-    name: "Leslie Alexander",
-    email: "leslie.alexander@example.com",
-    role: "Co-Founder / CEO",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    lastSeen: "3h ago",
-    lastSeenDateTime: "2023-01-23T13:23Z",
-  },
-  {
-    name: "Michael Foster",
-    email: "michael.foster@example.com",
-    role: "Co-Founder / CTO",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    lastSeen: "3h ago",
-    lastSeenDateTime: "2023-01-23T13:23Z",
-  },
-];
-
 export default function UserInfo() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState([
@@ -65,6 +44,10 @@ export default function UserInfo() {
       });
   };
 
+  const getUserDetail = async (event: any) => {
+    console.log(event.target);
+  };
+
   return (
     <div className="relative isolate px-6 pt-14 lg:px-8">
       <Headers />
@@ -74,7 +57,9 @@ export default function UserInfo() {
           {user.map((user) => (
             <li
               key={user.userId}
+              onClick={getUserDetail}
               className="flex justify-between gap-x-6 py-5 hover:bg-sky-50"
+              value={user.userId}
             >
               <div className="flex min-w-0 gap-x-4">
                 {/* <img

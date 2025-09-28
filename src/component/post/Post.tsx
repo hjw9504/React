@@ -43,7 +43,6 @@ export default function Post() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res.resultData);
         setUser(res.resultData);
       });
   };
