@@ -66,7 +66,7 @@ export default function Login() {
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.errorCode === 200) {
+          if (res.errorCode === 0) {
             onHandleData(res.resultData);
           } else {
             setIsLoginFail(true);
@@ -105,7 +105,7 @@ export default function Login() {
               value={userId}
               onChange={saveUserId}
               required
-              className="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-rose-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 bg-white transition-all duration-200"
             />
           </div>
 
@@ -117,14 +117,14 @@ export default function Login() {
               value={userPw}
               onChange={saveUserPw}
               required
-              className="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-rose-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 bg-white transition-all duration-200"
             />
           </div>
 
           <button
             type="button"
             onClick={onSignIn}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 mt-2 transition"
+            className="w-full bg-gradient-to-r from-rose-300 to-orange-300 hover:from-rose-400 hover:to-orange-400 text-white font-semibold rounded-xl py-2 mt-2 shadow-md transition-all duration-300"
           >
             로그인
           </button>

@@ -14,38 +14,23 @@ const navigation = [
 interface Post {
   id: number;
   username: string;
-  avatar: string;
-  content: string;
+  profileImage: string;
+  body: string;
   image?: string;
   likes: number;
   comments: number;
 }
 
-const dummyPosts: Post[] = [
-  {
-    id: 1,
-    username: "jung_dev",
-    avatar: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_1.png",
-    content: "오늘도 열코딩!",
-    image: "https://avatar.iran.liara.run/public/10",
-    likes: 11,
-    comments: 3,
-  },
-  {
-    id: 2,
-    username: "jane_doe",
-    avatar: "https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_2.png",
-    content: "주말에는 여행이 최고 🌴✈️",
-    likes: 20,
-    comments: 5,
-  },
-];
-
 export default function MyPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [name, setName] = useState("");
 
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    getPostByMemberId();
+  }, []);
 
   const logout = () => {
     cookie.remove("token");
@@ -53,32 +38,57 @@ export default function MyPage() {
     navigate("/login");
   };
 
+  const getPostByMemberId = async () => {
+    try {
+      const res = await fetch(
+        `posting/list?memberId=${cookie.load("memberId")}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            token: cookie.load("token"),
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.resultData) {
+        setPosts(data.resultData);
+      } else {
+        alert("Wrong User Id");
+      }
+    } catch (err) {
+      console.error("getUserInfo error:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Headers />
       <main className="grid grid-cols-12 gap-6 px-6 py-6">
         <section className="col-span-8 space-y-6">
-          {dummyPosts.map((post) => (
+          {posts.map((post) => (
             <article
               key={post.id}
               className="bg-white rounded-xl shadow p-4 space-y-3"
             >
               <div className="flex items-center space-x-3">
                 <img
-                  src={post.avatar}
+                  src={post.profileImage}
                   alt={post.username}
                   className="w-10 h-10 rounded-full"
                 />
                 <span className="font-semibold">{post.username}</span>
               </div>
 
-              <p className="text-gray-700">{post.content}</p>
+              <p className="text-gray-700">{post.body}</p>
 
               {post.image && (
                 <img
                   src={post.image}
                   alt="post"
-                  className="rounded-lg w-full"
+                  className="w-64 h-64 object-cover rounded-lg"
                 />
               )}
 
