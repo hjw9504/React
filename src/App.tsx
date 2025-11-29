@@ -3,10 +3,9 @@ import {Route, Routes} from "react-router-dom";
 import Home from "./component/user/Home";
 import Login from "./component/user/LoginNew";
 import UserInfo from "./component/user/UserInfo";
-import MyPage from "./component/Test";
 import Error from "./component/Error";
 import Register from "./component/user/Register";
-import MyNewPage from "./component/user/MyPageNew";
+import MyPage from "./component/user/MyPage";
 import MyInfo from "./component/user/MyInfo";
 import ResetPassword from "./component/user/ResetPassword";
 import Post from "./component/post/Post";
@@ -17,14 +16,14 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<MyNewPage />} />
+        <Route path="/" element={<MyPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/user" element={<UserInfo />}>
           <Route path=":id" element={<UserInfo />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/reset/password" element={<ResetPassword />} />
-        <Route path="/mypage" element={<MyNewPage />} />
+        <Route path="/mypage" element={<MyPage />} />
         <Route path="/myinfo" element={<MyInfo />} />
         <Route path="/test" element={<MyPage />} />
         <Route path="/post" element={<Post />} />

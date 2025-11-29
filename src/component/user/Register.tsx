@@ -5,10 +5,12 @@ import {useEffect, useLayoutEffect, useState} from "react";
 export default function Home() {
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
+  const [userPwCheck, setUserPwCheck] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
+  const isMatch = userPw !== "" && userPwCheck !== "" && userPw === userPwCheck;
 
   useLayoutEffect(() => {}, []);
 
@@ -25,6 +27,10 @@ export default function Home() {
 
   const saveUserPw = (event: any) => {
     setUserPw(event.target.value);
+  };
+
+  const saveUserPwCheck = (event: any) => {
+    setUserPwCheck(event.target.value);
   };
 
   const saveName = (event: any) => {
@@ -51,9 +57,10 @@ export default function Home() {
       .then((res) => {
         console.log(res);
         if (res.resultData) {
-          alert("Already Exist UserId");
+          alert("이미 사용중인 ID입니다.");
           setUserId("");
         } else {
+          alert("사용 가능한 ID입니다.");
           setIsChecked(true);
         }
       });
@@ -62,12 +69,12 @@ export default function Home() {
   const onSignUp = async () => {
     try {
       if (userId === "" || userPw === "" || name === "" || email === "") {
-        alert("Input All Infos");
+        alert("모든 정보를 입력해주세요!");
         return;
       }
 
       if (!isChecked) {
-        alert("Check User Id");
+        alert("ID 중복 체크를 진행해주세요!");
         return;
       }
 
@@ -89,7 +96,7 @@ export default function Home() {
           if (res.resultData === "success") {
             onHandleData(res);
           } else {
-            alert("Register Fail");
+            alert("회원가입 실패하였습니다.");
           }
         });
     } catch (err) {
@@ -102,139 +109,139 @@ export default function Home() {
   };
 
   return (
-    <>
-      {/*
-        This example requires updating your template:
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          회원가입
+        </h1>
 
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Register
-          </h2>
-        </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form className="space-y-4">
+          {/* USER ID */}
           <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="userId"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                ID
-              </label>
-            </div>
-            <div className="flex mt-2 my-2">
+            <label className="text-sm text-gray-600">아이디</label>
+            <div className="flex gap-2 mt-1">
               <input
-                id="userId"
+                type="text"
                 value={userId}
-                name="userId"
                 onChange={saveUserId}
                 disabled={isChecked}
-                type="text"
+                placeholder="아이디 입력"
                 required
-                className="block w-[70%] rounded-md border-0 mr-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="w-2/3 px-3 py-2 border border-rose-200 rounded-lg 
+                       bg-white focus:outline-none focus:ring-2 
+                       focus:ring-rose-300 transition-all duration-200"
               />
               <button
+                type="button"
                 onClick={checkUserId}
-                className="flex w-[30%] justify-center items-center rounded-md bg-indigo-600 px-3 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-1/3 bg-gradient-to-r from-rose-300 to-orange-300 
+                       hover:from-rose-400 hover:to-orange-400
+                       text-white font-semibold rounded-lg py-2 shadow-md 
+                       transition-all duration-300"
               >
-                Check ID
+                중복 확인
               </button>
             </div>
           </div>
 
+          {/* PASSWORD */}
           <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Password
-              </label>
-            </div>
-            <div className="mt-2 my-2">
-              <input
-                id="password"
-                name="password"
-                onChange={saveUserPw}
-                type="password"
-                autoComplete="current-password"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <label className="text-sm text-gray-600">비밀번호</label>
+            <input
+              type="password"
+              placeholder="비밀번호 입력"
+              value={userPw}
+              onChange={saveUserPw}
+              required
+              className="w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
+                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+                     transition-all duration-200"
+            />
           </div>
 
+          {/* PASSWORD CHECK */}
           <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Name
-              </label>
-            </div>
-            <div className="mt-2 my-2">
-              <input
-                id="name"
-                name="name"
-                onChange={saveName}
-                type="text"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <label className="text-sm text-gray-600">비밀번호 체크</label>
+            <input
+              type="password"
+              placeholder="비밀번호 입력"
+              value={userPwCheck}
+              onChange={saveUserPwCheck}
+              required
+              className={`w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
+                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+                     transition-all duration-200 focus:ring-2 ${
+                       userPwCheck === ""
+                         ? "border-rose-200 focus:ring-rose-300"
+                         : isMatch
+                         ? "border-green-400 focus:ring-green-300"
+                         : "border-red-400 focus:ring-red-300"
+                     }`}
+            />
           </div>
 
+          {/* NAME */}
           <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Email
-              </label>
-            </div>
-            <div className="mt-2 my-5">
-              <input
-                id="email"
-                name="email"
-                onChange={saveEmail}
-                type="email"
-                autoComplete="email"
-                required
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <label className="text-sm text-gray-600">이름</label>
+            <input
+              type="text"
+              placeholder="이름 입력"
+              value={name}
+              onChange={saveName}
+              required
+              className="w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
+                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+                     transition-all duration-200"
+            />
           </div>
 
-          <div className="flex justify-center">
-            <button
-              onClick={onSignUp}
-              className="w-[160px] justify-center rounded-md bg-indigo-600 py-1.5 mr-10 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Register
-            </button>
-            <button
-              onClick={goSignIn}
-              className="w-[160px] justify-center rounded-md bg-indigo-600 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Sign In
-            </button>
+          {/* EMAIL */}
+          <div>
+            <label className="text-sm text-gray-600">이메일</label>
+            <input
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={saveEmail}
+              required
+              className="w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
+                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+                     transition-all duration-200"
+            />
           </div>
-        </div>
+
+          {/* REGISTER BUTTON */}
+          <button
+            type="button"
+            onClick={onSignUp}
+            className="w-full bg-gradient-to-r from-rose-300 to-orange-300 
+                   hover:from-rose-400 hover:to-orange-400 
+                   text-white font-semibold rounded-xl py-2 mt-2
+                   shadow-md transition-all duration-300"
+          >
+            회원가입
+          </button>
+        </form>
+
+        {/* LOGIN 이동 */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          이미 계정이 있으신가요?{" "}
+          <Link to="/login" className="text-indigo-600 font-medium">
+            로그인
+          </Link>
+        </p>
+
+        {/* 메시지 */}
+        {userPwCheck !== "" && (
+          <p
+            className={`text-sm ${isMatch ? "text-green-600" : "text-red-600"}`}
+          >
+            {isMatch
+              ? "비밀번호가 일치합니다."
+              : "비밀번호가 일치하지 않습니다."}
+          </p>
+        )}
       </div>
-    </>
+    </div>
   );
 }

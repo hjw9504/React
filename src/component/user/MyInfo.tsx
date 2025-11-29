@@ -93,8 +93,10 @@ export default function Home() {
       });
       const result = await res.json();
 
-      if (result.errorCode === 200) {
+      if (result.errorCode === 0) {
         alert("NickName Updated");
+      } else if (result.errorCode === 106) {
+        alert("닉네임은 하루에 한번만 업데이트할 수 있습니다.");
       }
     } catch (err) {
       console.error("update nickname error:", err);
@@ -105,34 +107,37 @@ export default function Home() {
   const goMyPage = () => navigate("/mypage");
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-100">
       <Headers />
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <section className="w-full max-w-3xl mx-auto mt-1">
         {user && (
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <div className="bg-white rounded-xl shadow p-6 space-y-6">
+            <h2 className="text-xl font-semibold text-gray-900">내 프로필</h2>
+
             <UserInfoField label="ID" value={user.userId} />
             <UserInfoField label="Email" value={user.email} />
 
-            {/* NickName 수정 가능 */}
-            <div className="my-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900">
+            {/* NickName 수정 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">
                 NickName
               </label>
-              <div className="flex mt-2">
+              <div className="flex gap-2">
                 <input
                   id="nickName"
                   value={nickName}
                   onChange={onChangeNickName}
-                  className="block w-[70%] rounded-md border-0 mr-3 py-1.5 text-gray-900 
-                             shadow-sm ring-1 ring-inset ring-gray-300 
-                             focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="flex-1 rounded-md border border-gray-200 py-2 px-3
+                  text-sm text-gray-700 bg-gray-50 shadow-sm
+                  focus:border-indigo-300 focus:ring-indigo-200
+                  "
                 />
                 <button
                   onClick={onChangeNickNameToServer}
-                  className="flex w-[30%] justify-center items-center rounded-md bg-indigo-600 
-                             px-3 text-sm font-semibold leading-6 text-white shadow-sm 
-                             hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 
-                             focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="w-1/3 bg-gradient-to-r from-rose-300 to-orange-300 
+                  hover:from-rose-400 hover:to-orange-400
+                  text-white font-semibold rounded-lg py-2 shadow-md 
+                  transition-all duration-300"
                 >
                   Change
                 </button>
@@ -143,33 +148,33 @@ export default function Home() {
               label="Phone Number"
               value={user.phone || "Not Registered"}
             />
-            <UserInfoField label="Register Time" value={user.registerTime} />
+            <UserInfoField
+              label="Register Time"
+              value={new Date(user.registerTime).toLocaleString("ko-KR", {
+                timeZone: "Asia/Seoul",
+              })}
+            />
             <UserInfoField label="Role" value={user.role} />
 
             {/* 버튼 영역 */}
-            <div className="pt-5 flex justify-center">
+            <div className="grid grid-cols-2 gap-4 pt-4">
               <button
                 onClick={goMyPage}
-                className="w-[160px] justify-center rounded-md bg-indigo-600 py-1.5 mr-10 
-                           text-sm font-semibold leading-6 text-white shadow-sm 
-                           hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 
-                           focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full bg-gradient-to-r from-rose-300 to-orange-300 hover:from-rose-400 hover:to-orange-400 text-white font-semibold rounded-xl py-2 mt-2 shadow-md transition-all duration-300"
               >
                 My Page
               </button>
+
               <button
                 onClick={goSignIn}
-                className="w-[160px] justify-center rounded-md bg-indigo-600 py-1.5 
-                           text-sm font-semibold leading-6 text-white shadow-sm 
-                           hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 
-                           focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full bg-gradient-to-r from-rose-300 to-orange-300 hover:from-rose-400 hover:to-orange-400 text-white font-semibold rounded-xl py-2 mt-2 shadow-md transition-all duration-300"
               >
                 Sign In
               </button>
             </div>
           </div>
         )}
-      </div>
-    </>
+      </section>
+    </div>
   );
 }

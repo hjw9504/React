@@ -1,9 +1,7 @@
 import {useEffect, useLayoutEffect, useState} from "react";
-import {Dialog} from "@headlessui/react";
-import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
 import cookie from "react-cookies";
-import {useNavigate} from "react-router-dom";
-import Headers from "../utils/Headers";
+import {Link, useNavigate} from "react-router-dom";
+import Headers from "../utils/HeadersNew";
 
 const navigation = [
   {name: "Main", href: "/"},
@@ -11,11 +9,26 @@ const navigation = [
   {name: "Index", href: "/index"},
 ];
 
+interface Post {
+  id: number;
+  username: string;
+  profileImage: string;
+  body: string;
+  image?: string;
+  likes: number;
+  comments: number;
+}
+
 export default function MyPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [name, setName] = useState("");
 
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    getPostByMemberId();
+  }, []);
 
   const logout = () => {
     cookie.remove("token");
@@ -23,60 +36,114 @@ export default function MyPage() {
     navigate("/login");
   };
 
-  return (
-    <div className="bg-white">
-      <Headers />
+  const getPostByMemberId = async () => {
+    try {
+      const res = await fetch(
+        `posting/list?memberId=${cookie.load("memberId")}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            token: cookie.load("token"),
+          },
+        }
+      );
 
-      <div className="relative isolate px-6 pt-14 lg:px-8">
-        <div
-          className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-          aria-hidden="true"
-        >
-          <div
-            className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-            style={{
-              clipPath:
-                "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-            }}
-          />
-        </div>
-        <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              My Page
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
-              Hello! This is My Page! Thank You!
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <a
-                href="/myinfo"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                My Info
-              </a>
-              <a
-                href="#"
-                className="text-sm font-semibold leading-6 text-gray-900"
-              >
-                Learn more <span aria-hidden="true">→</span>
-              </a>
+      const data = await res.json();
+
+      if (data.resultData) {
+        setPosts(data.resultData);
+      } else {
+        alert("Wrong User Id");
+      }
+    } catch (err) {
+      console.error("getUserInfo error:", err);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Headers />
+      <main className="grid grid-cols-12 gap-6 px-6 py-6">
+        <section className="col-span-8 space-y-6">
+          {posts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl shadow">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/4076/4076503.png"
+                alt="empty"
+                className="w-24 h-24 opacity-70 mb-4"
+              />
+              <h2 className="text-xl font-semibold text-gray-700">
+                새로운 소식을 받아보세요
+              </h2>
+              <p className="text-gray-500 text-sm mt-2">
+                아직 게시물이 없습니다. 잠시 후 다시 확인해주세요!
+              </p>
             </div>
+          ) : (
+            posts.map((post) => (
+              <article
+                key={post.id}
+                className="bg-white rounded-xl shadow p-4 space-y-3"
+              >
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={post.profileImage}
+                    alt={post.username}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <span className="font-semibold">{post.username}</span>
+                </div>
+
+                <p className="text-gray-700">{post.body}</p>
+
+                {post.image && (
+                  <img
+                    src={post.image}
+                    alt="post"
+                    className="w-64 h-64 object-cover rounded-lg"
+                  />
+                )}
+
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>❤️ {post.likes} Likes</span>
+                  <span>💬 {post.comments} Comments</span>
+                </div>
+              </article>
+            ))
+          )}
+        </section>
+
+        <aside className="col-span-4">
+          <div className="bg-white rounded-xl shadow p-4">
+            <h2 className="text-lg font-semibold mb-3">추천 사용자</h2>
+            <ul className="space-y-3">
+              <li className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <img
+                    src="https://avatar.iran.liara.run/public/11"
+                    alt="추천1"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span>cool_dev</span>
+                </div>
+                <button className="text-sm text-indigo-600">팔로우</button>
+              </li>
+              <li className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <img
+                    src="https://avatar.iran.liara.run/public/15"
+                    alt="추천2"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span>fun_coder</span>
+                </div>
+                <button className="text-sm text-indigo-600">팔로우</button>
+              </li>
+            </ul>
           </div>
-        </div>
-        <div
-          className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-          aria-hidden="true"
-        >
-          <div
-            className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-            style={{
-              clipPath:
-                "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-            }}
-          />
-        </div>
-      </div>
+        </aside>
+      </main>
     </div>
   );
 }
