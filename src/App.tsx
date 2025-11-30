@@ -8,6 +8,7 @@ import Register from "./component/user/Register";
 import MyPage from "./component/user/MyPage";
 import MyInfo from "./component/user/MyInfo";
 import ResetPassword from "./component/user/ResetPassword";
+import WritePost from "./component/post/WritePost";
 import Post from "./component/post/Post";
 import PostDetail from "./component/post/PostDetail";
 import PostEdit from "./component/post/PostEdit";

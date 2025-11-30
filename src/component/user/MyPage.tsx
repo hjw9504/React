@@ -2,6 +2,7 @@ import {useEffect, useLayoutEffect, useState} from "react";
 import cookie from "react-cookies";
 import {Link, useNavigate} from "react-router-dom";
 import Headers from "../utils/HeadersNew";
+import WritePost from "../post/WritePost";
 
 const navigation = [
   {name: "Main", href: "/"},
@@ -59,6 +60,24 @@ export default function MyPage() {
     } catch (err) {
       console.error("getUserInfo error:", err);
     }
+  };
+
+  const user = {
+    username: "정우",
+    profileImage: "https://avatar.iran.liara.run/public/21",
+  };
+
+  const handleCreatePost = (text: string) => {
+    const newPost: Post = {
+      id: Date.now(),
+      username: user.username,
+      profileImage: user.profileImage,
+      body: text,
+      likes: 0,
+      comments: 0,
+    };
+
+    setPosts((prev) => [newPost, ...prev]);
   };
 
   return (

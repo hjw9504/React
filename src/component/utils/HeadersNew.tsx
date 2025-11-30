@@ -5,13 +5,13 @@ import cookie from "react-cookies";
 const Headers = () => {
   const userNavigation = [
     {name: "Main", href: "/mypage"},
-    {name: "Post", href: "/post"},
+    {name: "WritePost", href: "/post"},
   ];
 
   const adminNavigation = [
     {name: "Main", href: "/mypage"},
     {name: "User", href: "/user"},
-    {name: "Post", href: "/post"},
+    {name: "WritePost", href: "/post"},
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -52,6 +52,9 @@ const Headers = () => {
       <nav className="space-x-6">
         <Link to="/mypage" className="text-gray-600 hover:text-orange-500">
           홈
+        </Link>
+        <Link to="/post" className="text-gray-600 hover:text-orange-500">
+          글쓰기
         </Link>
         <Link to="/myinfo" className="text-gray-600 hover:text-orange-500">
           프로필

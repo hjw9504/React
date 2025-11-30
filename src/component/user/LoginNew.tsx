@@ -130,12 +130,21 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          계정이 없으신가요?{" "}
-          <Link to="/register" className="text-indigo-600 font-medium">
-            회원가입
-          </Link>
-        </p>
+        <div className="flex gap-3 justify-center">
+          <p className="text-center text-sm text-gray-500 mt-6">
+            계정이 없으신가요?{" "}
+            <Link to="/register" className="text-indigo-600 font-medium">
+              회원가입
+            </Link>
+          </p>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            비밀번호를 잊으셨나요?{" "}
+            <Link to="/reset/password" className="text-indigo-600 font-medium">
+              비밀번호 찾기
+            </Link>
+          </p>
+        </div>
 
         {isLoginFail && (
           <p className="text-red-500 text-sm mt-2">

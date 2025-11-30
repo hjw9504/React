@@ -1,5 +1,3 @@
-import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
-import {Dialog} from "@headlessui/react";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import Headers from "../utils/Headers";
