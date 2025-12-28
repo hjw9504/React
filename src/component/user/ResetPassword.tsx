@@ -26,6 +26,7 @@ export default function ResetPassword() {
 
     if (data.resultData) {
       setIsExist(true);
+      alert("비밀번호를 업데이트해주세요!");
     } else {
       setUserId("");
       alert("ID를 찾을 수 없습니다!");
@@ -34,12 +35,12 @@ export default function ResetPassword() {
 
   const onResetPassword = async () => {
     if (!userId || !newPassword || !newPasswordCheck) {
-      alert("Input All Infos");
+      alert("모든 값을 입력해주세요!");
       return;
     }
 
     if (newPassword !== newPasswordCheck) {
-      alert("Password is not equal! Check New Password");
+      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
       setNewPassword("");
       setNewPasswordCheck("");
       return;
@@ -58,12 +59,17 @@ export default function ResetPassword() {
 
     const data = await res.json();
 
-    if (data.resultData === "success") {
-      alert("Password Changed!");
+    if (data.errorCode === 0) {
+      alert("비밀번호가 정상적으로 업데이트되었습니다.");
       navigate("/login");
+    } else if (data.errorCode === 107) {
+      alert("비밀번호가 최근에 사용하신 것과 동일합니다.");
     } else {
-      alert("Register Fail");
+      alert("비밀번호 등록이 실패하였습니다.");
     }
+
+    setNewPassword("");
+    setNewPasswordCheck("");
   };
 
   const goSignIn = () => navigate("/login");
@@ -72,7 +78,7 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
-          Reset Password
+          비밀번호 재설정
         </h1>
         <p className="text-sm text-center text-gray-500 mb-6">
           비밀번호를 재설정해 주세요.
@@ -108,7 +114,7 @@ export default function ResetPassword() {
         {/* PW */}
         <div className="mb-5">
           <label className="text-sm text-gray-700 font-medium">
-            New Password
+            신규 비밀번호
           </label>
           <input
             type="password"
@@ -123,7 +129,7 @@ export default function ResetPassword() {
         {/* PW CHECK */}
         <div className="mb-6">
           <label className="text-sm text-gray-700 font-medium">
-            New Password Check
+            신규 비밀번호 확인
           </label>
           <input
             type="password"
@@ -143,7 +149,7 @@ export default function ResetPassword() {
                        hover:from-rose-400 hover:to-orange-400 
                        text-white font-semibold py-2 rounded-xl shadow-md transition"
           >
-            Reset
+            비밀번호 재설정
           </button>
           <button
             onClick={goSignIn}
@@ -151,7 +157,7 @@ export default function ResetPassword() {
                        hover:from-rose-400 hover:to-orange-400 
                        text-white font-semibold py-2 rounded-xl shadow-md transition"
           >
-            Sign In
+            로그인
           </button>
         </div>
       </div>
