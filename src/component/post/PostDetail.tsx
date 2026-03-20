@@ -1,197 +1,126 @@
-import {useEffect, useLayoutEffect, useRef, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import Headers from "../utils/Headers";
+import {useEffect, useState} from "react";
+import {LoaderFunctionArgs, useLoaderData, useNavigate, useParams} from "react-router-dom";
+import Headers from "../utils/HeadersNew";
 import cookie from "react-cookies";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import {Button} from "@material-tailwind/react";
-import Alert from "../utils/Alert";
 
-const modules = {
-  toolbar: {
-    container: [
-      [{header: [1, 2, 3, 4, 5, 6, false]}],
-      [{font: []}],
-      [{align: []}],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [{list: "ordered"}, {list: "bullet"}, "link"],
-      [
-        {
-          color: [
-            "#000000",
-            "#e60000",
-            "#ff9900",
-            "#ffff00",
-            "#008a00",
-            "#0066cc",
-            "#9933ff",
-            "#ffffff",
-            "#facccc",
-            "#ffebcc",
-            "#ffffcc",
-            "#cce8cc",
-            "#cce0f5",
-            "#ebd6ff",
-            "#bbbbbb",
-            "#f06666",
-            "#ffc266",
-            "#ffff66",
-            "#66b966",
-            "#66a3e0",
-            "#c285ff",
-            "#888888",
-            "#a10000",
-            "#b26b00",
-            "#b2b200",
-            "#006100",
-            "#0047b2",
-            "#6b24b2",
-            "#444444",
-            "#5c0000",
-            "#663d00",
-            "#666600",
-            "#003700",
-            "#002966",
-            "#3d1466",
-            "custom-color",
-          ],
-        },
-        {background: []},
-      ],
-      ["image", "video"],
-      ["clean"],
-    ],
-  },
-};
+interface Post {
+  id: string;
+  memberId: string;
+  title: string;
+  body: string;
+  registerTime: string;
+  modTime: string;
+  name: string;
+  profileImage: string;
+}
+
+export async function postDetailLoader({params}: LoaderFunctionArgs) {
+  const res = await fetch(`/posting/detail/${params.postingId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token: cookie.load("token"),
+    },
+  });
+  const data = await res.json();
+  return {post: data.resultData || null};
+}
 
 export default function PostDetail() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [post, setPost] = useState({
-    id: "",
-    memberId: "",
-    title: "",
-    body: "",
-    registerTime: "",
-    modTime: "",
-    name: "",
-  });
-  const [postingId, setPostingId] = useState("");
-  const [body, setBody] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const {post} = useLoaderData() as {post: Post | null};
   const [isNotUser, setIsNotUser] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
-  useLayoutEffect(() => {
-    getPostingDetail();
-    if (cookie.load("role") === "ADMIN") {
-      setIsAdmin(true);
-    }
-  }, []);
-
   useEffect(() => {
-    let timer = setTimeout(() => {
-      setIsNotUser(false);
-    }, 1000);
-    return () => {
-      clearTimeout(timer);
-    };
+    if (!isNotUser) return;
+    const timer = setTimeout(() => setIsNotUser(false), 2000);
+    return () => clearTimeout(timer);
   }, [isNotUser]);
 
   const onEditPost = () => {
-    if (!isAdmin && post.memberId !== cookie.load("memberId")) {
+    if (
+      post?.memberId !== cookie.load("memberId") &&
+      cookie.load("role") !== "ADMIN"
+    ) {
       setIsNotUser(true);
       return;
     }
     navigate(`/post/edit/${params.postingId}`);
   };
 
-  const goPostMain = () => {
-    navigate(`/post`);
-  };
-
-  const getPostingDetail = async () => {
-    await fetch(
-      `/posting/detail/${params.postingId}?memberId=${cookie.load("memberId")}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          token: cookie.load("token"),
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        setPost(res.resultData);
-      });
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleString("ko-KR", {timeZone: "Asia/Seoul"});
   };
 
   return (
-    <div className="relative isolate px-6 pt-14 lg:px-8">
+    <div className="min-h-screen bg-gray-100">
       <Headers />
+      <main className="px-6 py-6 max-w-3xl mx-auto space-y-4">
+        {post ? (
+          <div className="bg-white rounded-xl shadow p-6 space-y-5">
+            {/* 작성자 헤더 */}
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+              <div className="flex items-center space-x-3">
+                <img
+                  src={`${post.profileImage}`}
+                  alt="profile"
+                  className="w-10 h-10 rounded-full border-2 border-orange-200"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {post.name}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {formatDate(post.registerTime)}
+                  </p>
+                </div>
+              </div>
+              {post.modTime && post.modTime !== post.registerTime && (
+                <p className="text-xs text-gray-400">
+                  수정됨: {formatDate(post.modTime)}
+                </p>
+              )}
+            </div>
 
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Post Detail
-          </h2>
-        </div>
+            {/* 제목 */}
+            <h1 className="text-xl font-bold text-gray-800">{post.title}</h1>
 
-        <div>
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Title
-            </label>
+            {/* 본문 */}
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+              {post.body}
+            </p>
+
+            {/* 경고 메시지 */}
+            {isNotUser && (
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-600">
+                본인의 게시글만 수정할 수 있습니다.
+              </div>
+            )}
+
+            {/* 버튼 */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                onClick={() => navigate("/mypage")}
+                className="w-full border border-gray-200 text-gray-600 font-semibold
+                           rounded-xl py-2 shadow-sm hover:bg-gray-50 transition-all duration-300"
+              >
+                목록으로
+              </button>
+              <button
+                onClick={onEditPost}
+                className="w-full bg-gradient-to-r from-rose-300 to-orange-300
+                           hover:from-rose-400 hover:to-orange-400
+                           text-white font-semibold rounded-xl py-2 shadow-sm
+                           transition-all duration-300"
+              >
+                수정하기
+              </button>
+            </div>
           </div>
-          <div className="flex mt-2 my-2">
-            <input
-              id="title"
-              value={post.title}
-              name="title"
-              readOnly
-              type="text"
-              required
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <ReactQuill readOnly value={post.body} modules={modules} />
-        </div>
-        <div>
-          {isNotUser ? (
-            <Alert
-              alertMessage="You can't edit this post"
-              alertType="alert-error"
-            />
-          ) : null}
-        </div>
-        <div>
-          <div className="flex justify-between pt-10">
-            <button
-              onClick={goPostMain}
-              className="w-[160px] rounded-md bg-indigo-600 py-1.5 mr-10 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Go Post Main
-            </button>
-            <button
-              onClick={onEditPost}
-              className="w-[160px] rounded-md bg-indigo-600 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Go Edit Page
-            </button>
-          </div>
-        </div>
-      </div>
+        ) : null}
+      </main>
     </div>
   );
 }

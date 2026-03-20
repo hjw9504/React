@@ -1,243 +1,187 @@
-import {useEffect, useLayoutEffect, useRef, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import Headers from "../utils/Headers";
+import {useEffect, useState} from "react";
+import {LoaderFunctionArgs, useLoaderData, useNavigate, useParams} from "react-router-dom";
+import Headers from "../utils/HeadersNew";
 import cookie from "react-cookies";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import Alert from "../utils/Alert";
 
-const modules = {
-  toolbar: {
-    container: [
-      [{header: [1, 2, 3, 4, 5, 6, false]}],
-      [{font: []}],
-      [{align: []}],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [{list: "ordered"}, {list: "bullet"}, "link"],
-      [
-        {
-          color: [
-            "#000000",
-            "#e60000",
-            "#ff9900",
-            "#ffff00",
-            "#008a00",
-            "#0066cc",
-            "#9933ff",
-            "#ffffff",
-            "#facccc",
-            "#ffebcc",
-            "#ffffcc",
-            "#cce8cc",
-            "#cce0f5",
-            "#ebd6ff",
-            "#bbbbbb",
-            "#f06666",
-            "#ffc266",
-            "#ffff66",
-            "#66b966",
-            "#66a3e0",
-            "#c285ff",
-            "#888888",
-            "#a10000",
-            "#b26b00",
-            "#b2b200",
-            "#006100",
-            "#0047b2",
-            "#6b24b2",
-            "#444444",
-            "#5c0000",
-            "#663d00",
-            "#666600",
-            "#003700",
-            "#002966",
-            "#3d1466",
-            "custom-color",
-          ],
-        },
-        {background: []},
-      ],
-      ["image", "video"],
-      ["clean"],
-    ],
-  },
-};
+interface Post {
+  id: string;
+  memberId: string;
+  title: string;
+  body: string;
+  registerTime: string;
+  modTime: string;
+  name: string;
+  profileImage: string;
+}
 
-export default function PostDetail() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [post, setPost] = useState({
-    id: "",
-    memberId: "",
-    title: "",
-    body: "",
-    registerTime: "",
-    modTime: "",
-    name: "",
+export async function postEditLoader({params}: LoaderFunctionArgs) {
+  const res = await fetch(`/posting/detail/${params.postingId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token: cookie.load("token"),
+    },
   });
-  const [postingId, setPostingId] = useState("");
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const data = await res.json();
+  return {post: data.resultData || null};
+}
+
+export default function PostEdit() {
+  const {post} = useLoaderData() as {post: Post | null};
+  const [title, setTitle] = useState(post?.title || "");
+  const [body, setBody] = useState(post?.body || "");
   const [isNotUser, setIsNotUser] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
-  useLayoutEffect(() => {
-    getPostingDetail();
-
-    if (cookie.load("role") === "ADMIN") {
-      setIsAdmin(true);
-    }
-  }, []);
-
   useEffect(() => {
-    if (showAlert) {
-      let showAlertTimer = setTimeout(() => {
-        setShowAlert(false);
+    if (showSuccess) {
+      const timer = setTimeout(() => {
         navigate(`/post/detail/${params.postingId}`);
       }, 1000);
-      return () => {
-        clearTimeout(showAlertTimer);
-      };
+      return () => clearTimeout(timer);
     }
+  }, [showSuccess]);
 
+  useEffect(() => {
     if (isNotUser) {
-      let isNotUserTimer = setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsNotUser(false);
         navigate(`/post/detail/${params.postingId}`);
       }, 1000);
-      return () => {
-        clearTimeout(isNotUserTimer);
-      };
+      return () => clearTimeout(timer);
     }
-  }, [showAlert, isNotUser]);
-
-  const getPostingDetail = async () => {
-    await fetch(
-      `/posting/detail/${params.postingId}?memberId=${cookie.load("memberId")}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          token: cookie.load("token"),
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        setPost(res.resultData);
-        setBody(res.resultData.body);
-        setTitle(res.resultData.title);
-      });
-  };
-
-  const onSaveTitle = (event: any) => {
-    setTitle(event.target.value);
-  };
-
-  const onSavePost = (text: any) => {
-    setBody(text);
-  };
+  }, [isNotUser]);
 
   const onEditPost = async () => {
-    if (!isAdmin && cookie.load("memberId") !== post.memberId) {
+    if (!title.trim() || !body.trim()) {
+      alert("제목과 내용을 입력해주세요.");
+      return;
+    }
+
+    if (
+      post?.memberId !== cookie.load("memberId") &&
+      cookie.load("role") !== "ADMIN"
+    ) {
       setIsNotUser(true);
       return;
     }
 
-    const data = {
-      id: params.postingId,
-      memberId: cookie.load("memberId"),
-      title: title,
-      body: body,
-    };
-    await fetch(`/posting/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        token: cookie.load("token"),
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setShowAlert(true);
+    try {
+      const data = {
+        id: params.postingId,
+        memberId: cookie.load("memberId"),
+        title,
+        body,
+        registerTime: post?.registerTime ?? "",
+        modTime: "",
+      };
+      const res = await fetch(`/posting/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: cookie.load("token"),
+        },
+        body: JSON.stringify(data),
       });
+      const result = await res.json();
+      if (result.errorCode === 0) {
+        setShowSuccess(true);
+      }
+    } catch (err) {
+      console.error("onEditPost error:", err);
+    }
   };
 
   return (
-    <div className="relative isolate px-6 pt-14 lg:px-8">
+    <div className="min-h-screen bg-gray-100">
       <Headers />
+      <main className="px-6 py-6 max-w-3xl mx-auto space-y-4">
+        <div className="bg-white rounded-xl shadow p-6 space-y-4">
+          {/* 헤더 */}
+          <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
+            <img
+              src={`${post?.profileImage}`}
+              alt="profile"
+              className="w-10 h-10 rounded-full border-2 border-orange-200"
+            />
+            <div>
+              <p className="text-sm font-semibold text-gray-800">
+                {post?.name || "사용자"}
+              </p>
+              <p className="text-xs text-gray-400">게시글 수정</p>
+            </div>
+          </div>
 
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Post Edit
-          </h2>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Title
+          {/* 제목 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">
+              제목
             </label>
-          </div>
-          <div className="flex mt-2 my-2">
             <input
-              id="title"
-              value={title}
-              onChange={onSaveTitle}
-              name="title"
               type="text"
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목을 입력하세요"
+              className="block w-full rounded-lg border border-gray-200 py-2 px-3
+                         text-sm text-gray-700 bg-gray-50 shadow-sm
+                         focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200"
             />
           </div>
-        </div>
-        <div>
-          <ReactQuill value={body} onChange={onSavePost} modules={modules} />
-        </div>
-        <div>
-          {showAlert ? (
-            <Alert alertMessage="Success" alertType="alert-success" />
-          ) : null}
-        </div>
-        <div>
-          {isNotUser ? (
-            <Alert
-              alertMessage="You can't edit this post"
-              alertType="alert-error"
+
+          {/* 내용 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">
+              내용
+            </label>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="내용을 입력하세요"
+              rows={10}
+              className="block w-full rounded-lg border border-gray-200 py-2 px-3
+                         text-sm text-gray-700 bg-gray-50 shadow-sm resize-none
+                         focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200"
             />
-          ) : null}
-        </div>
-        <div className="flex justify-end pt-5 mr-5">
-          <a className="tooltip tooltip-right" data-tip="Home">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 cursor-pointer"
-              onClick={onEditPost}
+            <p className="text-xs text-gray-400 mt-1 text-right">
+              {body.length}자
+            </p>
+          </div>
+
+          {/* 알림 메시지 */}
+          {showSuccess && (
+            <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-2 text-sm text-green-600">
+              수정이 완료되었습니다. 잠시 후 이동합니다.
+            </div>
+          )}
+          {isNotUser && (
+            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-600">
+              본인의 게시글만 수정할 수 있습니다.
+            </div>
+          )}
+
+          {/* 버튼 */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <button
+              onClick={() => navigate(`/post/detail/${params.postingId}`)}
+              className="w-full border border-gray-200 text-gray-600 font-semibold
+                         rounded-xl py-2 shadow-sm hover:bg-gray-50 transition-all duration-300"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-              />
-            </svg>
-          </a>
+              취소
+            </button>
+            <button
+              onClick={onEditPost}
+              className="w-full bg-gradient-to-r from-rose-300 to-orange-300
+                         hover:from-rose-400 hover:to-orange-400
+                         text-white font-semibold rounded-xl py-2 shadow-sm
+                         transition-all duration-300"
+            >
+              저장하기
+            </button>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

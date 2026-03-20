@@ -1,14 +1,7 @@
-import {useEffect, useLayoutEffect, useState} from "react";
+import {useState} from "react";
 import cookie from "react-cookies";
-import {Link, useNavigate} from "react-router-dom";
+import {useLoaderData, useNavigate} from "react-router-dom";
 import Headers from "../utils/HeadersNew";
-import WritePost from "../post/WritePost";
-
-const navigation = [
-  {name: "Main", href: "/"},
-  {name: "MyPage", href: "/mypage"},
-  {name: "Index", href: "/index"},
-];
 
 interface Post {
   id: number;
@@ -20,64 +13,27 @@ interface Post {
   comments: number;
 }
 
+export async function myPageLoader() {
+  const res = await fetch(`/posting/list?memberId=${cookie.load("memberId")}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token: cookie.load("token"),
+    },
+  });
+  const data = await res.json();
+  return {posts: data.resultData || []};
+}
+
 export default function MyPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [name, setName] = useState("");
-
+  const {posts: initialPosts} = useLoaderData() as {posts: Post[]};
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
   const navigate = useNavigate();
-
-  useLayoutEffect(() => {
-    getPostByMemberId();
-  }, []);
 
   const logout = () => {
     cookie.remove("token");
     cookie.remove("name");
     navigate("/login");
-  };
-
-  const getPostByMemberId = async () => {
-    try {
-      const res = await fetch(
-        `posting/list?memberId=${cookie.load("memberId")}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            token: cookie.load("token"),
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.resultData) {
-        setPosts(data.resultData);
-      } else {
-        alert("Wrong User Id");
-      }
-    } catch (err) {
-      console.error("getUserInfo error:", err);
-    }
-  };
-
-  const user = {
-    username: "정우",
-    profileImage: "https://avatar.iran.liara.run/public/21",
-  };
-
-  const handleCreatePost = (text: string) => {
-    const newPost: Post = {
-      id: Date.now(),
-      username: user.username,
-      profileImage: user.profileImage,
-      body: text,
-      likes: 0,
-      comments: 0,
-    };
-
-    setPosts((prev) => [newPost, ...prev]);
   };
 
   return (
@@ -103,7 +59,8 @@ export default function MyPage() {
             posts.map((post) => (
               <article
                 key={post.id}
-                className="bg-white rounded-xl shadow p-4 space-y-3"
+                onClick={() => navigate(`/post/detail/${post.id}`)}
+                className="bg-white rounded-xl shadow p-4 space-y-3 cursor-pointer hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex items-center space-x-3">
                   <img
@@ -140,7 +97,7 @@ export default function MyPage() {
               <li className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <img
-                    src="https://avatar.iran.liara.run/public/11"
+                    src="https://api.dicebear.com/7.x/lorelei/svg?seed=test"
                     alt="추천1"
                     className="w-8 h-8 rounded-full"
                   />
@@ -151,7 +108,7 @@ export default function MyPage() {
               <li className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <img
-                    src="https://avatar.iran.liara.run/public/15"
+                    src="https://api.dicebear.com/7.x/lorelei/svg?seed=wonder"
                     alt="추천2"
                     className="w-8 h-8 rounded-full"
                   />

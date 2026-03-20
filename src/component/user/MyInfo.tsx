@@ -1,5 +1,5 @@
-import {useEffect, useLayoutEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useState} from "react";
+import {useLoaderData, useNavigate} from "react-router-dom";
 import cookie from "react-cookies";
 import Headers from "../utils/HeadersNew";
 
@@ -12,16 +12,25 @@ interface User {
   registerTime: string;
   recentLoginTime: string;
   role: string;
+  profileImage: string;
+}
+
+export async function myInfoLoader() {
+  const res = await fetch(`/user/info?memberId=${cookie.load("memberId")}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token: cookie.load("token"),
+    },
+  });
+  const data = await res.json();
+  return {user: data.resultData?.[0] || null};
 }
 
 export default function Home() {
-  const [nickName, setNickName] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const {user} = useLoaderData() as {user: User | null};
+  const [nickName, setNickName] = useState(user?.nickName || "");
   const navigate = useNavigate();
-
-  useLayoutEffect(() => {
-    getUserInfo();
-  }, []);
 
   const UserInfoField = ({
     label,
@@ -32,45 +41,19 @@ export default function Home() {
     value: string;
     disabled?: boolean;
   }) => (
-    <div className="my-2">
-      <label className="block text-sm font-medium leading-6 text-gray-900">
+    <div>
+      <label className="block text-sm font-medium text-gray-500 mb-1">
         {label}
       </label>
       <input
         value={value || ""}
         disabled={disabled}
-        className="block w-full rounded-md border-0 py-1.5 text-gray-900 
-                   shadow-sm ring-1 ring-inset ring-gray-300 
-                   placeholder:text-gray-400 focus:ring-2 
-                   focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        className="block w-full rounded-lg border border-gray-200 py-2 px-3
+                   text-sm text-gray-700 bg-gray-50 shadow-sm
+                   disabled:opacity-70"
       />
     </div>
   );
-
-  const getUserInfo = async () => {
-    try {
-      const res = await fetch(
-        `/user/info?memberId=${cookie.load("memberId")}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            token: cookie.load("token"),
-          },
-        }
-      );
-      const data = await res.json();
-
-      if (data.resultData) {
-        setUser(data.resultData[0]);
-        setNickName(data.resultData[0].nickName);
-      } else {
-        alert("Wrong User Id");
-      }
-    } catch (err) {
-      console.error("getUserInfo error:", err);
-    }
-  };
 
   const onChangeNickName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickName(e.target.value);
@@ -109,72 +92,119 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Headers />
-      <section className="w-full max-w-3xl mx-auto mt-1">
-        {user && (
-          <div className="bg-white rounded-xl shadow p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900">내 프로필</h2>
-
-            <UserInfoField label="ID" value={user.userId} />
-            <UserInfoField label="Email" value={user.email} />
-
-            {/* NickName 수정 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                NickName
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="nickName"
-                  value={nickName}
-                  onChange={onChangeNickName}
-                  className="flex-1 rounded-md border border-gray-200 py-2 px-3
-                  text-sm text-gray-700 bg-gray-50 shadow-sm
-                  focus:border-indigo-300 focus:ring-indigo-200
-                  "
+      <main className="grid grid-cols-12 gap-6 px-6 py-6">
+        {/* 프로필 폼 */}
+        <section className="col-span-8 space-y-4">
+          {user && (
+            <div className="bg-white rounded-xl shadow p-6 space-y-4">
+              {/* 프로필 헤더 */}
+              <div className="flex items-center space-x-4 pb-4 border-b border-gray-100">
+                <img
+                  src={`${user.profileImage}`}
+                  alt="profile"
+                  className="w-14 h-14 rounded-full border-2 border-orange-200"
                 />
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {user.nickName || user.name}
+                  </h2>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                </div>
+              </div>
+
+              <UserInfoField label="ID" value={user.userId} />
+              <UserInfoField label="Email" value={user.email} />
+
+              {/* NickName 수정 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">
+                  NickName
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="nickName"
+                    value={nickName}
+                    onChange={onChangeNickName}
+                    className="flex-1 rounded-lg border border-gray-200 py-2 px-3
+                    text-sm text-gray-700 bg-gray-50 shadow-sm
+                    focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200"
+                  />
+                  <button
+                    onClick={onChangeNickNameToServer}
+                    className="px-4 bg-gradient-to-r from-rose-300 to-orange-300
+                    hover:from-rose-400 hover:to-orange-400
+                    text-white text-sm font-semibold rounded-lg py-2 shadow-sm
+                    transition-all duration-300"
+                  >
+                    Change
+                  </button>
+                </div>
+              </div>
+
+              <UserInfoField
+                label="Phone Number"
+                value={user.phone || "Not Registered"}
+              />
+              <UserInfoField
+                label="Register Time"
+                value={new Date(user.registerTime).toLocaleString("ko-KR", {
+                  timeZone: "Asia/Seoul",
+                })}
+              />
+              <UserInfoField label="Role" value={user.role} />
+
+              {/* 버튼 영역 */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
                 <button
-                  onClick={onChangeNickNameToServer}
-                  className="w-1/3 bg-gradient-to-r from-rose-300 to-orange-300 
+                  onClick={goMyPage}
+                  className="w-full bg-gradient-to-r from-rose-300 to-orange-300
                   hover:from-rose-400 hover:to-orange-400
-                  text-white font-semibold rounded-lg py-2 shadow-md 
+                  text-white font-semibold rounded-xl py-2 shadow-sm
                   transition-all duration-300"
                 >
-                  Change
+                  My Page
+                </button>
+                <button
+                  onClick={goSignIn}
+                  className="w-full bg-gradient-to-r from-rose-300 to-orange-300
+                  hover:from-rose-400 hover:to-orange-400
+                  text-white font-semibold rounded-xl py-2 shadow-sm
+                  transition-all duration-300"
+                >
+                  Sign In
                 </button>
               </div>
             </div>
+          )}
+        </section>
 
-            <UserInfoField
-              label="Phone Number"
-              value={user.phone || "Not Registered"}
-            />
-            <UserInfoField
-              label="Register Time"
-              value={new Date(user.registerTime).toLocaleString("ko-KR", {
-                timeZone: "Asia/Seoul",
-              })}
-            />
-            <UserInfoField label="Role" value={user.role} />
-
-            {/* 버튼 영역 */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <button
-                onClick={goMyPage}
-                className="w-full bg-gradient-to-r from-rose-300 to-orange-300 hover:from-rose-400 hover:to-orange-400 text-white font-semibold rounded-xl py-2 mt-2 shadow-md transition-all duration-300"
-              >
-                My Page
-              </button>
-
-              <button
-                onClick={goSignIn}
-                className="w-full bg-gradient-to-r from-rose-300 to-orange-300 hover:from-rose-400 hover:to-orange-400 text-white font-semibold rounded-xl py-2 mt-2 shadow-md transition-all duration-300"
-              >
-                Sign In
-              </button>
-            </div>
+        {/* 사이드바 */}
+        <aside className="col-span-4">
+          <div className="bg-white rounded-xl shadow p-4">
+            <h2 className="text-lg font-semibold mb-3">계정 정보</h2>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li className="flex justify-between">
+                <span className="text-gray-500">역할</span>
+                <span className="font-medium">{user?.role ?? "-"}</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-gray-500">가입일</span>
+                <span className="font-medium">
+                  {user
+                    ? new Date(user.registerTime).toLocaleDateString("ko-KR", {
+                        timeZone: "Asia/Seoul",
+                      })
+                    : "-"}
+                </span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-gray-500">닉네임</span>
+                <span className="font-medium">{user?.nickName ?? "-"}</span>
+              </li>
+            </ul>
           </div>
-        )}
-      </section>
+        </aside>
+      </main>
     </div>
   );
 }
