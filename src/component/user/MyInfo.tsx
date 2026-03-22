@@ -78,6 +78,7 @@ export default function Home() {
 
       if (result.errorCode === 0) {
         alert("NickName Updated");
+        window.location.reload();
       } else if (result.errorCode === 106) {
         alert("닉네임은 하루에 한번만 업데이트할 수 있습니다.");
       }
@@ -144,12 +145,6 @@ export default function Home() {
               <UserInfoField
                 label="Phone Number"
                 value={user.phone || "Not Registered"}
-              />
-              <UserInfoField
-                label="Register Time"
-                value={new Date(user.registerTime).toLocaleString("ko-KR", {
-                  timeZone: "Asia/Seoul",
-                })}
               />
               <UserInfoField label="Role" value={user.role} />
 

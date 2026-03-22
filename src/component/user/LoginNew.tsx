@@ -96,7 +96,7 @@ export default function Login() {
           로그인
         </h1>
 
-        <form onSubmit={onSignIn} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); onSignIn(); }} className="space-y-4">
           <div>
             <label className="text-sm text-gray-600">아이디</label>
             <input
@@ -122,7 +122,7 @@ export default function Login() {
           </div>
 
           <button
-            type="button"
+            type="submit"
             onClick={onSignIn}
             className="w-full bg-gradient-to-r from-rose-300 to-orange-300 hover:from-rose-400 hover:to-orange-400 text-white font-semibold rounded-xl py-2 mt-2 shadow-md transition-all duration-300"
           >

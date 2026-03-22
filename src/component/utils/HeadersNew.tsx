@@ -41,14 +41,14 @@ const Headers = () => {
     cookie.remove("memberId");
     cookie.remove("role");
     cookie.remove("userId");
-    navigate("/login");
+    window.location.href = "/login";
   };
 
   return (
     <header className="bg-white shadow px-6 py-4 flex justify-between items-center">
-      <span className="text-3xl font-extrabold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent tracking-tight">
+      <Link to="/mypage" className="text-3xl font-extrabold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent tracking-tight">
         JUNGS
-      </span>
+      </Link>
       <nav className="space-x-6">
         <Link to="/mypage" className="text-gray-600 hover:text-orange-500">
           홈
