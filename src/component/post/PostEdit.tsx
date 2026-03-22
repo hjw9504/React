@@ -97,7 +97,7 @@ export default function PostEdit() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Headers />
-      <main className="px-6 py-6 max-w-3xl mx-auto space-y-4">
+      <main className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl mx-auto space-y-4">
         <div className="bg-white rounded-xl shadow p-6 space-y-4">
           {/* 헤더 */}
           <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">

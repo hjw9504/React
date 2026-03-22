@@ -82,8 +82,8 @@ export default function MyPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Headers />
-      <main className="grid grid-cols-12 gap-6 px-6 py-6">
-        <section className="col-span-8 space-y-6">
+      <main className="grid grid-cols-1 md:grid-cols-12 gap-6 px-4 sm:px-6 py-4 sm:py-6">
+        <section className="col-span-1 md:col-span-8 space-y-6 order-2 md:order-1">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl shadow">
               <img
@@ -142,7 +142,7 @@ export default function MyPage() {
           )}
         </section>
 
-        <aside className="col-span-4">
+        <aside className="col-span-1 md:col-span-4 order-1 md:order-2">
           <div className="bg-white rounded-xl shadow p-4">
             <h2 className="text-lg font-semibold mb-3">추천 사용자</h2>
             <ul className="space-y-3">

@@ -93,9 +93,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Headers />
-      <main className="grid grid-cols-12 gap-6 px-6 py-6">
+      <main className="grid grid-cols-1 md:grid-cols-12 gap-6 px-4 sm:px-6 py-4 sm:py-6">
         {/* 프로필 폼 */}
-        <section className="col-span-8 space-y-4">
+        <section className="col-span-1 md:col-span-8 space-y-4">
           {user && (
             <div className="bg-white rounded-xl shadow p-6 space-y-4">
               {/* 프로필 헤더 */}
@@ -174,7 +174,7 @@ export default function Home() {
         </section>
 
         {/* 사이드바 */}
-        <aside className="col-span-4">
+        <aside className="col-span-1 md:col-span-4">
           <div className="bg-white rounded-xl shadow p-4">
             <h2 className="text-lg font-semibold mb-3">계정 정보</h2>
             <ul className="space-y-3 text-sm text-gray-600">

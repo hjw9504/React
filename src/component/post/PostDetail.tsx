@@ -96,7 +96,7 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Headers />
-      <main className="px-6 py-6 max-w-3xl mx-auto space-y-4">
+      <main className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl mx-auto space-y-4">
         {post ? (
           <div className="bg-white rounded-xl shadow overflow-hidden">
             {/* 탭 헤더 (작성자에게만 표시) */}
