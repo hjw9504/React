@@ -22,7 +22,7 @@ interface LikeUser {
 }
 
 export async function postDetailLoader({params}: LoaderFunctionArgs) {
-  const res = await fetch(`/posting/detail/${params.postingId}`, {
+  const res = await fetch(`/api/posting/detail/${params.postingId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function PostDetail() {
     if (likeUsers.length > 0) return; // 이미 불러왔으면 재요청 안함
     setLikesLoading(true);
     try {
-      const res = await fetch(`/posting/likes/${params.postingId}`, {
+      const res = await fetch(`/api/posting/likes/${params.postingId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -156,7 +156,7 @@ export default function PostDetail() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className={`grid ${isOwner ? "grid-cols-2" : "grid-cols-1"} gap-3 pt-2`}>
                     <button
                       onClick={() => navigate("/mypage")}
                       className="w-full border border-gray-200 text-gray-600 font-semibold
@@ -164,15 +164,17 @@ export default function PostDetail() {
                     >
                       목록으로
                     </button>
-                    <button
-                      onClick={onEditPost}
-                      className="w-full bg-gradient-to-r from-rose-300 to-orange-300
-                                 hover:from-rose-400 hover:to-orange-400
-                                 text-white font-semibold rounded-xl py-2 shadow-sm
-                                 transition-all duration-300"
-                    >
-                      수정하기
-                    </button>
+                    {isOwner && (
+                      <button
+                        onClick={onEditPost}
+                        className="w-full bg-gradient-to-r from-rose-300 to-orange-300
+                                   hover:from-rose-400 hover:to-orange-400
+                                   text-white font-semibold rounded-xl py-2 shadow-sm
+                                   transition-all duration-300"
+                      >
+                        수정하기
+                      </button>
+                    )}
                   </div>
                 </>
               )}

@@ -30,7 +30,8 @@
     "start": "DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && tar -cvf build.tar ./build && scp -i ../../Desktop/aws-key.pem build.tar ubuntu@54.180.225.237:/home/ubuntu/ && ssh -i ../../Desktop/aws-key.pem ubuntu@54.180.225.237 'sudo rm -rf /var/www/html/* && tar -xvf /home/ubuntu/build.tar -C /home/ubuntu/ && sudo cp -r /home/ubuntu/build/* /var/www/html/ && sudo chmod -R 755 /var/www/html'"
   },
   "eslintConfig": {
     "extends": [
@@ -59,5 +60,5 @@
     "postcss-loader": "^7.3.3",
     "tailwindcss": "^3.3.6"
   },
-  "proxy": "http://localhost:8081"
+  "proxy": "http://54.180.225.237:8080"
 }

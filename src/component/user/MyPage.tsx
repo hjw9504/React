@@ -21,7 +21,7 @@ interface Post {
 }
 
 export async function myPageLoader() {
-  const res = await fetch(`/posting/all?memberId=${cookie.load("memberId")}`, {
+  const res = await fetch(`/api/posting/all?memberId=${cookie.load("memberId")}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -32,6 +32,11 @@ export async function myPageLoader() {
   const posts = (data.resultData || []).sort((a: Post, b: Post) => b.id - a.id);
   return {posts};
 }
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleString("ko-KR", {timeZone: "Asia/Seoul"});
+};
 
 export default function MyPage() {
   const {posts: initialPosts} = useLoaderData() as {posts: Post[]};
@@ -45,8 +50,8 @@ export default function MyPage() {
     e.stopPropagation();
     const isLiked = likedPostIds.has(postId);
     const url = isLiked
-      ? `/posting/likes/d/${postId}`
-      : `/posting/likes/i/${postId}`;
+      ? `/api/posting/likes/d/${postId}`
+      : `/api/posting/likes/i/${postId}`;
 
     try {
       const res = await fetch(url, {
@@ -135,7 +140,7 @@ export default function MyPage() {
                       <span>{post.comments ?? 0}</span>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400">{post.registerTime}</span>
+                  <span className="text-xs text-gray-400">{formatDate(post.registerTime)}</span>
                 </div>
               </article>
             ))

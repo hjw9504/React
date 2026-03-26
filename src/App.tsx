@@ -11,6 +11,7 @@ import ResetPassword from "./component/user/ResetPassword";
 import Post, {postLoader} from "./component/post/Post";
 import PostDetail, {postDetailLoader} from "./component/post/PostDetail";
 import PostEdit, {postEditLoader} from "./component/post/PostEdit";
+import IdpResult from "./component/user/IdpResult";
 
 const router = createBrowserRouter([
   {path: "/", element: <MyPage />, loader: myPageLoader},
@@ -36,6 +37,8 @@ const router = createBrowserRouter([
     element: <PostEdit />,
     loader: postEditLoader,
   },
+  {path: "/idp/result", element: <IdpResult />},
+  {path: "/api/idp/result", element: <IdpResult />},
   {path: "/*", element: <Error />},
 ]);
 

@@ -15,7 +15,7 @@ interface Post {
 }
 
 export async function postEditLoader({params}: LoaderFunctionArgs) {
-  const res = await fetch(`/posting/detail/${params.postingId}`, {
+  const res = await fetch(`/api/posting/detail/${params.postingId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export default function PostEdit() {
         registerTime: post?.registerTime ?? "",
         modTime: "",
       };
-      const res = await fetch(`/posting/register`, {
+      const res = await fetch(`/api/posting/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

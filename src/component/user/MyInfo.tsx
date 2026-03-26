@@ -16,13 +16,16 @@ interface User {
 }
 
 export async function myInfoLoader() {
-  const res = await fetch(`/user/info?memberId=${cookie.load("memberId")}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      token: cookie.load("token"),
-    },
-  });
+  const res = await fetch(
+    `/api/user/info?member_id=${cookie.load("memberId")}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token: cookie.load("token"),
+      },
+    }
+  );
   const data = await res.json();
   return {user: data.resultData?.[0] || null};
 }
@@ -66,7 +69,7 @@ export default function Home() {
         userId: cookie.load("userId"),
         nickName,
       };
-      const res = await fetch(`/update/nickname`, {
+      const res = await fetch(`/api/update/nickname`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

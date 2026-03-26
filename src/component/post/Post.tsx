@@ -4,7 +4,7 @@ import cookie from "react-cookies";
 import Headers from "../utils/HeadersNew";
 
 export async function postLoader() {
-  const res = await fetch(`/user/info?memberId=${cookie.load("memberId")}`, {
+  const res = await fetch(`/api/user/info?memberId=${cookie.load("memberId")}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export default function Post() {
       registerTime: "",
       modTime: "",
     };
-    const res = await fetch("/posting/register", {
+    const res = await fetch("/api/posting/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -47,7 +47,7 @@ export default function Home() {
       return;
     }
 
-    await fetch(`/check/userId?userId=${userId}`, {
+    await fetch(`/api/check/userId?userId=${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -78,13 +78,18 @@ export default function Home() {
         return;
       }
 
+      if (userPw != userPwCheck) {
+        alert("비밀번호를 다시 확인해주세요!");
+        return;
+      }
+
       const data = {
         userId: userId,
         userPw: userPw,
         name: name,
         email: email,
       };
-      await fetch(`/user/register`, {
+      await fetch(`/api/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,9 +173,9 @@ export default function Home() {
               value={userPwCheck}
               onChange={saveUserPwCheck}
               required
-              className={`w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
-                     focus:outline-none focus:ring-2 focus:ring-rose-300 
-                     transition-all duration-200 focus:ring-2 ${
+              className={`w-full px-3 py-2 border rounded-lg bg-white
+                     focus:outline-none focus:ring-2
+                     transition-all duration-200 ${
                        userPwCheck === ""
                          ? "border-rose-200 focus:ring-rose-300"
                          : isMatch
@@ -178,6 +183,17 @@ export default function Home() {
                          : "border-red-400 focus:ring-red-300"
                      }`}
             />
+            {userPwCheck !== "" && (
+              <p
+                className={`text-xs mt-1 ${
+                  isMatch ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {isMatch
+                  ? "✓ 비밀번호가 일치합니다."
+                  : "✗ 비밀번호가 일치하지 않습니다."}
+              </p>
+            )}
           </div>
 
           {/* NAME */}
@@ -230,17 +246,6 @@ export default function Home() {
             로그인
           </Link>
         </p>
-
-        {/* 메시지 */}
-        {userPwCheck !== "" && (
-          <p
-            className={`text-sm ${isMatch ? "text-green-600" : "text-red-600"}`}
-          >
-            {isMatch
-              ? "비밀번호가 일치합니다."
-              : "비밀번호가 일치하지 않습니다."}
-          </p>
-        )}
       </div>
     </div>
   );
