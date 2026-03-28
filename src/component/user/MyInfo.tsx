@@ -45,14 +45,14 @@ export default function Home() {
     disabled?: boolean;
   }) => (
     <div>
-      <label className="block text-sm font-medium text-gray-500 mb-1">
+      <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
         {label}
       </label>
       <input
         value={value || ""}
         disabled={disabled}
-        className="block w-full rounded-lg border border-gray-200 py-2 px-3
-                   text-sm text-gray-700 bg-gray-50 shadow-sm
+        className="block w-full rounded-lg border border-gray-200 dark:border-gray-600 py-2 px-3
+                   text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 shadow-sm
                    disabled:opacity-70"
       />
     </div>
@@ -94,34 +94,31 @@ export default function Home() {
   const goMyPage = () => navigate("/mypage");
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
       <Headers />
       <main className="grid grid-cols-1 md:grid-cols-12 gap-6 px-4 sm:px-6 py-4 sm:py-6">
-        {/* 프로필 폼 */}
         <section className="col-span-1 md:col-span-8 space-y-4">
           {user && (
-            <div className="bg-white rounded-xl shadow p-6 space-y-4">
-              {/* 프로필 헤더 */}
-              <div className="flex items-center space-x-4 pb-4 border-b border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-4">
+              <div className="flex items-center space-x-4 pb-4 border-b border-gray-100 dark:border-gray-700">
                 <img
                   src={`${user.profileImage}`}
                   alt="profile"
                   className="w-14 h-14 rounded-full border-2 border-orange-200"
                 />
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-800">
+                  <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                     {user.nickName || user.name}
                   </h2>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
                 </div>
               </div>
 
               <UserInfoField label="ID" value={user.userId} />
               <UserInfoField label="Email" value={user.email} />
 
-              {/* NickName 수정 */}
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   NickName
                 </label>
                 <div className="flex gap-2">
@@ -129,8 +126,8 @@ export default function Home() {
                     id="nickName"
                     value={nickName}
                     onChange={onChangeNickName}
-                    className="flex-1 rounded-lg border border-gray-200 py-2 px-3
-                    text-sm text-gray-700 bg-gray-50 shadow-sm
+                    className="flex-1 rounded-lg border border-gray-200 dark:border-gray-600 py-2 px-3
+                    text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 shadow-sm
                     focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200"
                   />
                   <button
@@ -151,7 +148,6 @@ export default function Home() {
               />
               <UserInfoField label="Role" value={user.role} />
 
-              {/* 버튼 영역 */}
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <button
                   onClick={goMyPage}
@@ -176,17 +172,16 @@ export default function Home() {
           )}
         </section>
 
-        {/* 사이드바 */}
         <aside className="col-span-1 md:col-span-4">
-          <div className="bg-white rounded-xl shadow p-4">
-            <h2 className="text-lg font-semibold mb-3">계정 정보</h2>
-            <ul className="space-y-3 text-sm text-gray-600">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+            <h2 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">계정 정보</h2>
+            <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
               <li className="flex justify-between">
-                <span className="text-gray-500">역할</span>
+                <span className="text-gray-500 dark:text-gray-400">역할</span>
                 <span className="font-medium">{user?.role ?? "-"}</span>
               </li>
               <li className="flex justify-between">
-                <span className="text-gray-500">가입일</span>
+                <span className="text-gray-500 dark:text-gray-400">가입일</span>
                 <span className="font-medium">
                   {user
                     ? new Date(user.registerTime).toLocaleDateString("ko-KR", {
@@ -196,7 +191,7 @@ export default function Home() {
                 </span>
               </li>
               <li className="flex justify-between">
-                <span className="text-gray-500">닉네임</span>
+                <span className="text-gray-500 dark:text-gray-400">닉네임</span>
                 <span className="font-medium">{user?.nickName ?? "-"}</span>
               </li>
             </ul>
