@@ -27,7 +27,7 @@ export async function myInfoLoader() {
     }
   );
   const data = await res.json();
-  return {user: data.resultData?.[0] || null};
+  return {user: data.result_data?.[0] || null};
 }
 
 export default function Home() {
@@ -79,10 +79,10 @@ export default function Home() {
       });
       const result = await res.json();
 
-      if (result.errorCode === 0) {
+      if (result.error_code === 0) {
         alert("NickName Updated");
         window.location.reload();
-      } else if (result.errorCode === 106) {
+      } else if (result.error_code === 106) {
         alert("닉네임은 하루에 한번만 업데이트할 수 있습니다.");
       }
     } catch (err) {

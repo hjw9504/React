@@ -23,7 +23,7 @@ export async function postEditLoader({params}: LoaderFunctionArgs) {
     },
   });
   const data = await res.json();
-  return {post: data.resultData || null};
+  return {post: data.result_data || null};
 }
 
 export default function PostEdit() {
@@ -86,7 +86,7 @@ export default function PostEdit() {
         body: JSON.stringify(data),
       });
       const result = await res.json();
-      if (result.errorCode === 0) {
+      if (result.error_code === 0) {
         setShowSuccess(true);
       }
     } catch (err) {

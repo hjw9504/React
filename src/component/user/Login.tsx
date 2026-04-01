@@ -56,7 +56,7 @@ export default function Login() {
         userId: userId,
         userPw: userPw,
       };
-      await fetch(`/user/login`, {
+      await fetch(`/api/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,8 +65,8 @@ export default function Login() {
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.errorCode === 200) {
-            onHandleData(res.resultData);
+          if (res.error_code === 200) {
+            onHandleData(res.result_data);
           } else {
             setIsLoginFail(true);
           }

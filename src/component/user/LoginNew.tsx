@@ -55,8 +55,8 @@ export default function Login() {
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.errorCode === 0) {
-            onHandleData(res.resultData);
+          if (res.error_code === 0) {
+            onHandleData(res.result_data);
           } else {
             setIsLoginFail(true);
           }
@@ -161,21 +161,29 @@ export default function Login() {
                 <path d="M12 3C6.477 3 2 6.597 2 11c0 2.775 1.638 5.206 4.1 6.652l-.9 3.568a.3.3 0 0 0 .462.322l4.347-2.903C10.63 18.877 11.307 19 12 19c5.523 0 10-3.597 10-8S17.523 3 12 3z" />
               </svg>
             </button>
-            <span className="text-xs text-gray-500 dark:text-gray-400">카카오 로그인</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              카카오 로그인
+            </span>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center mt-5 sm:mt-6">
           <p className="text-center text-sm sm:text-base text-gray-500 dark:text-gray-400">
             계정이 없으신가요?{" "}
-            <Link to="/register" className="text-indigo-600 dark:text-indigo-400 font-medium">
+            <Link
+              to="/terms"
+              className="text-indigo-600 dark:text-indigo-400 font-medium"
+            >
               회원가입
             </Link>
           </p>
 
           <p className="text-center text-sm sm:text-base text-gray-500 dark:text-gray-400">
             비밀번호를 잊으셨나요?{" "}
-            <Link to="/reset/password" className="text-indigo-600 dark:text-indigo-400 font-medium">
+            <Link
+              to="/reset/password"
+              className="text-indigo-600 dark:text-indigo-400 font-medium"
+            >
               비밀번호 찾기
             </Link>
           </p>

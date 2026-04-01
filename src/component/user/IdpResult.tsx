@@ -46,14 +46,11 @@ export default function IdpResult() {
       });
       const checkData = await checkRes.json();
 
-      // 2. 미가입이면 회원가입
-      if (checkData.resultData === false) {
-        setStatus("회원가입 처리 중...");
-        await fetch(`/api/user/idp/register`, {
-          method: "POST",
-          headers,
-          body,
-        });
+      // 2. 미가입이면 약관 동의 페이지로 이동
+      if (checkData.result_data === false) {
+        sessionStorage.setItem("idp_pending", JSON.stringify({accessToken, idpType}));
+        navigate("/terms?from=idp");
+        return;
       }
 
       // 3. 로그인
@@ -65,8 +62,8 @@ export default function IdpResult() {
       });
       const loginData = await loginRes.json();
 
-      if (loginData.errorCode === 0) {
-        const user = loginData.resultData;
+      if (loginData.error_code === 0) {
+        const user = loginData.result_data;
         setCookie("token", user.token);
         setCookie("name", user.name);
         setCookie("memberId", user.memberId);

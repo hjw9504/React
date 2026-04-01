@@ -15,7 +15,7 @@ export async function postLoader() {
     }
   );
   const data = await res.json();
-  return {profileImage: data.resultData?.[0]?.profileImage || ""};
+  return {profileImage: data.result_data?.[0]?.profileImage || ""};
 }
 
 export default function Post() {
@@ -59,7 +59,7 @@ export default function Post() {
       body: JSON.stringify(data),
     });
     const result = await res.json();
-    if (result.errorCode === 0) {
+    if (result.error_code === 0) {
       navigate("/mypage");
     }
   };

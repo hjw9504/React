@@ -56,7 +56,7 @@ export default function Home() {
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        if (res.resultData) {
+        if (res.result_data) {
           alert("이미 사용중인 ID입니다.");
           setUserId("");
         } else {
@@ -98,7 +98,7 @@ export default function Home() {
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.resultData === "success") {
+          if (res.result_data === "success") {
             onHandleData(res);
           } else {
             alert("회원가입 실패하였습니다.");

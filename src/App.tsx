@@ -12,6 +12,9 @@ import Post, {postLoader} from "./component/post/Post";
 import PostDetail, {postDetailLoader} from "./component/post/PostDetail";
 import PostEdit, {postEditLoader} from "./component/post/PostEdit";
 import IdpResult from "./component/user/IdpResult";
+import Friends, {friendsLoader} from "./component/user/Friends";
+import Terms from "./component/user/Terms";
+import Chat from "./component/chat/Chat";
 
 const router = createBrowserRouter([
   {path: "/", element: <MyPage />, loader: myPageLoader},
@@ -37,6 +40,10 @@ const router = createBrowserRouter([
     element: <PostEdit />,
     loader: postEditLoader,
   },
+  {path: "/friends", element: <Friends />, loader: friendsLoader},
+  {path: "/chat", element: <Chat />},
+  {path: "/terms", element: <Terms />},
+  {path: "/chat", element: <Chat />},
   {path: "/idp/result", element: <IdpResult />},
   {path: "/api/idp/result", element: <IdpResult />},
   {path: "/*", element: <Error />},

@@ -40,7 +40,7 @@ export default function UserInfo() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setUser(res.resultData);
+        setUser(res.result_data);
       });
   };
 

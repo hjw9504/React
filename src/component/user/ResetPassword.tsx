@@ -24,7 +24,7 @@ export default function ResetPassword() {
     });
     const data = await res.json();
 
-    if (data.resultData) {
+    if (data.result_data) {
       setIsExist(true);
       alert("비밀번호를 업데이트해주세요!");
     } else {
@@ -59,10 +59,10 @@ export default function ResetPassword() {
 
     const data = await res.json();
 
-    if (data.errorCode === 0) {
+    if (data.error_code === 0) {
       alert("비밀번호가 정상적으로 업데이트되었습니다.");
       navigate("/login");
-    } else if (data.errorCode === 107) {
+    } else if (data.error_code === 107) {
       alert("비밀번호가 최근에 사용하신 것과 동일합니다.");
     } else {
       alert("비밀번호 등록이 실패하였습니다.");

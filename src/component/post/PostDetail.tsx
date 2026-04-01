@@ -37,7 +37,7 @@ export async function postDetailLoader({params}: LoaderFunctionArgs) {
     },
   });
   const data = await res.json();
-  return {post: data.resultData || null};
+  return {post: data.result_data || null};
 }
 
 type Tab = "content" | "likes";
@@ -52,6 +52,8 @@ export default function PostDetail() {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
@@ -79,7 +81,7 @@ export default function PostDetail() {
         },
       });
       const data = await res.json();
-      setLikeUsers(data.resultData || []);
+      setLikeUsers(data.result_data || []);
     } catch (err) {
       console.error("fetchLikeUsers error:", err);
     } finally {
@@ -98,7 +100,7 @@ export default function PostDetail() {
         },
       });
       const data = await res.json();
-      const list: Comment[] = data.resultData?.comments || [];
+      const list: Comment[] = data.result_data?.comments || [];
       list.sort((a, b) => new Date(b.register_time).getTime() - new Date(a.register_time).getTime());
       setComments(list);
     } catch (err) {
@@ -137,6 +139,23 @@ export default function PostDetail() {
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
     if (tab === "likes") fetchLikeUsers();
+  };
+
+  const onDeletePost = async () => {
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/posting/${params.postingId}`, {
+        method: "DELETE",
+        headers: {
+          token: cookie.load("token"),
+        },
+      });
+      navigate("/mypage");
+    } catch (err) {
+      console.error("deletePost error:", err);
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const onEditPost = () => {
@@ -213,9 +232,29 @@ export default function PostDetail() {
                           <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(post.registerTime)}</p>
                         </div>
                       </div>
-                      {post.modTime && post.modTime !== post.registerTime && (
-                        <p className="text-xs text-gray-400 dark:text-gray-500">수정됨: {formatDate(post.modTime)}</p>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {post.modTime && post.modTime !== post.registerTime && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500">수정됨: {formatDate(post.modTime)}</p>
+                        )}
+                        {isOwner && (
+                          <button
+                            onClick={() => setShowDeleteConfirm((v) => !v)}
+                            title="게시글 삭제"
+                            className="flex items-center justify-center w-8 h-8 rounded-lg
+                                       bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/50
+                                       text-red-400 hover:text-red-500 dark:text-red-400
+                                       transition-all duration-200"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"/>
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                              <path d="M10 11v6M14 11v6"/>
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                            </svg>
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{post.title}</h1>
@@ -224,6 +263,33 @@ export default function PostDetail() {
                     {isNotUser && (
                       <div className="rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-2 text-sm text-red-600 dark:text-red-400">
                         본인의 게시글만 수정할 수 있습니다.
+                      </div>
+                    )}
+
+                    {showDeleteConfirm && (
+                      <div className="rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-3 space-y-3">
+                        <p className="text-sm font-semibold text-red-600 dark:text-red-400 text-center">
+                          정말 이 게시글을 삭제하시겠습니까?
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => setShowDeleteConfirm(false)}
+                            className="w-full border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300
+                                       font-semibold rounded-xl py-2 text-sm
+                                       hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+                          >
+                            취소
+                          </button>
+                          <button
+                            onClick={onDeletePost}
+                            disabled={isDeleting}
+                            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold
+                                       rounded-xl py-2 text-sm shadow-sm
+                                       disabled:opacity-50 transition-all duration-300"
+                          >
+                            {isDeleting ? "삭제 중..." : "삭제 확인"}
+                          </button>
+                        </div>
                       </div>
                     )}
 
