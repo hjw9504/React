@@ -6,23 +6,23 @@ import HeadersNew from "../utils/HeadersNew";
 
 interface ChattingDto {
   type: "ENTER" | "TALK" | "LEAVE";
-  roomId?: number;
-  roomName: string;
-  memberId: string;
-  token: string;
+  room_id?: number;
+  room_name?: string;
+  token?: string;
   sender: string;
   message: string;
-  member_id?: string; // 히스토리 메시지 본인 식별용
+  member_id?: string;
+  user_id?: string;
   time?: string;
 }
 
 interface ChatHistoryItem {
   message: string;
-  memberId: string;
+  member_id: string;
   sender: string;
-  roomId: number;
-  userId: string | null;
-  registerTime: string;
+  room_id: number;
+  user_id: string | null;
+  register_time: string;
 }
 
 interface ChatRoom {
@@ -87,7 +87,7 @@ const Chat = () => {
         const isSystem =
           item.message.includes("님이 입장하셨습니다") ||
           item.message.includes("님이 퇴장하셨습니다");
-        const time = new Date(item.registerTime + "Z").toLocaleTimeString(
+        const time = new Date(item.register_time + "Z").toLocaleTimeString(
           "ko-KR",
           {
             hour: "2-digit",
@@ -97,11 +97,9 @@ const Chat = () => {
         );
         return {
           type: isSystem ? "ENTER" : "TALK",
-          roomName: "",
-          memberId: "",
-          token: "",
-          sender: item.userId || item.sender,
-          member_id: item.memberId,
+          sender: item.user_id || item.sender,
+          member_id: item.member_id,
+          user_id: item.user_id || item.sender,
           message: item.message,
           time,
         };
@@ -379,11 +377,11 @@ const Chat = () => {
           ) : (
             <div key={idx} className="flex gap-2 items-end">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {msg.sender.charAt(0)}
+                {(msg.user_id || msg.sender || "?").charAt(0).toUpperCase()}
               </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 ml-1">
-                  {msg.sender}
+              <div className="min-w-0">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 ml-1 truncate max-w-[120px]">
+                  {msg.user_id || msg.sender}
                 </p>
                 <div className="flex gap-2 items-end">
                   <div className="max-w-[75%] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm border border-gray-100 dark:border-gray-700">
