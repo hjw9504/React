@@ -47,7 +47,7 @@ export default function Home() {
       return;
     }
 
-    await fetch(`/api/check/userId?userId=${userId}`, {
+    await fetch(`/api/check/userId?user_id=${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -84,8 +84,8 @@ export default function Home() {
       }
 
       const data = {
-        userId: userId,
-        userPw: userPw,
+        user_id: userId,
+        user_pw: userPw,
         name: name,
         email: email,
       };

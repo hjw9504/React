@@ -19,7 +19,7 @@ export default function ResetPassword() {
       return;
     }
 
-    const res = await fetch(`/api/check/userId?userId=${userId}`, {
+    const res = await fetch(`/api/check/userId?user_id=${userId}`, {
       headers: {"Content-Type": "application/json"},
     });
     const data = await res.json();
@@ -47,8 +47,8 @@ export default function ResetPassword() {
     }
 
     const body = {
-      userId: userId,
-      newUserPw: newPassword,
+      user_id: userId,
+      new_user_pw: newPassword,
     };
 
     const res = await fetch(`/api/reset/password`, {

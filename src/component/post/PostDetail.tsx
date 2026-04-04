@@ -1,5 +1,10 @@
 import {useEffect, useState} from "react";
-import {LoaderFunctionArgs, useLoaderData, useNavigate, useParams} from "react-router-dom";
+import {
+  LoaderFunctionArgs,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Headers from "../utils/HeadersNew";
 import cookie from "react-cookies";
 
@@ -23,9 +28,10 @@ interface LikeUser {
 
 interface Comment {
   member_id: string;
+  user_id?: string;
   comment: string;
   register_time: string;
-  profileImage: string;
+  profile_image: string;
 }
 
 export async function postDetailLoader({params}: LoaderFunctionArgs) {
@@ -101,7 +107,11 @@ export default function PostDetail() {
       });
       const data = await res.json();
       const list: Comment[] = data.result_data?.comments || [];
-      list.sort((a, b) => new Date(b.register_time).getTime() - new Date(a.register_time).getTime());
+      list.sort(
+        (a, b) =>
+          new Date(b.register_time).getTime() -
+          new Date(a.register_time).getTime()
+      );
       setComments(list);
     } catch (err) {
       console.error("fetchComments error:", err);
@@ -196,9 +206,10 @@ export default function PostDetail() {
                   <button
                     onClick={() => handleTabChange("content")}
                     className={`flex-1 py-3 text-sm font-semibold transition-colors duration-200
-                      ${activeTab === "content"
-                        ? "text-orange-500 border-b-2 border-orange-400"
-                        : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                      ${
+                        activeTab === "content"
+                          ? "text-orange-500 border-b-2 border-orange-400"
+                          : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                       }`}
                   >
                     게시글
@@ -206,9 +217,10 @@ export default function PostDetail() {
                   <button
                     onClick={() => handleTabChange("likes")}
                     className={`flex-1 py-3 text-sm font-semibold transition-colors duration-200
-                      ${activeTab === "likes"
-                        ? "text-orange-500 border-b-2 border-orange-400"
-                        : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                      ${
+                        activeTab === "likes"
+                          ? "text-orange-500 border-b-2 border-orange-400"
+                          : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                       }`}
                   >
                     ❤️ 좋아요
@@ -228,13 +240,19 @@ export default function PostDetail() {
                           className="w-10 h-10 rounded-full border-2 border-orange-200"
                         />
                         <div>
-                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{post.name}</p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(post.registerTime)}</p>
+                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                            {post.name}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            {formatDate(post.registerTime)}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {post.modTime && post.modTime !== post.registerTime && (
-                          <p className="text-xs text-gray-400 dark:text-gray-500">수정됨: {formatDate(post.modTime)}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            수정됨: {formatDate(post.modTime)}
+                          </p>
                         )}
                         {isOwner && (
                           <button
@@ -245,20 +263,32 @@ export default function PostDetail() {
                                        text-red-400 hover:text-red-500 dark:text-red-400
                                        transition-all duration-200"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="3 6 5 6 21 6"/>
-                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                              <path d="M10 11v6M14 11v6"/>
-                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-4 h-4"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                             </svg>
                           </button>
                         )}
                       </div>
                     </div>
 
-                    <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{post.title}</h1>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{post.body}</p>
+                    <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                      {post.title}
+                    </h1>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                      {post.body}
+                    </p>
 
                     {isNotUser && (
                       <div className="rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-2 text-sm text-red-600 dark:text-red-400">
@@ -293,7 +323,11 @@ export default function PostDetail() {
                       </div>
                     )}
 
-                    <div className={`grid ${isOwner ? "grid-cols-2" : "grid-cols-1"} gap-3 pt-2`}>
+                    <div
+                      className={`grid ${
+                        isOwner ? "grid-cols-2" : "grid-cols-1"
+                      } gap-3 pt-2`}
+                    >
                       <button
                         onClick={() => navigate("/mypage")}
                         className="w-full border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300
@@ -323,7 +357,10 @@ export default function PostDetail() {
                     {likesLoading ? (
                       <div className="space-y-3">
                         {[1, 2, 3].map((i) => (
-                          <div key={i} className="flex items-center space-x-3 animate-pulse">
+                          <div
+                            key={i}
+                            className="flex items-center space-x-3 animate-pulse"
+                          >
                             <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
                             <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
                           </div>
@@ -332,20 +369,29 @@ export default function PostDetail() {
                     ) : likeUsers.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
                         <span className="text-4xl mb-3">🤍</span>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">아직 좋아요를 누른 사람이 없습니다.</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          아직 좋아요를 누른 사람이 없습니다.
+                        </p>
                       </div>
                     ) : (
                       <ul className="divide-y divide-gray-50 dark:divide-gray-700">
                         {likeUsers.map((u) => (
-                          <li key={u.memberId} className="flex items-center space-x-3 py-3">
+                          <li
+                            key={u.memberId}
+                            className="flex items-center space-x-3 py-3"
+                          >
                             <img
                               src={u.profileImage}
                               alt={u.name}
                               className="w-10 h-10 rounded-full border border-gray-100 dark:border-gray-600"
                             />
                             <div>
-                              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{u.name}</p>
-                              <p className="text-xs text-gray-400 dark:text-gray-500">@{u.userId}</p>
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                {u.name}
+                              </p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500">
+                                @{u.userId}
+                              </p>
                             </div>
                           </li>
                         ))}
@@ -360,7 +406,10 @@ export default function PostDetail() {
             {activeTab === "content" && (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-4">
                 <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200">
-                  댓글 {comments.length > 0 && <span className="text-orange-400">{comments.length}</span>}
+                  댓글{" "}
+                  {comments.length > 0 && (
+                    <span className="text-orange-400">{comments.length}</span>
+                  )}
                 </h2>
 
                 {/* 댓글 입력 */}
@@ -392,7 +441,10 @@ export default function PostDetail() {
                 {commentsLoading ? (
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-start space-x-3 animate-pulse">
+                      <div
+                        key={i}
+                        className="flex items-start space-x-3 animate-pulse"
+                      >
                         <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
                         <div className="flex-1 space-y-1">
                           <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -404,22 +456,31 @@ export default function PostDetail() {
                 ) : comments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
                     <span className="text-3xl mb-2">💬</span>
-                    <p className="text-gray-400 dark:text-gray-500 text-sm">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm">
+                      아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+                    </p>
                   </div>
                 ) : (
                   <ul className="divide-y divide-gray-50 dark:divide-gray-700">
                     {comments.map((c, idx) => (
                       <li key={idx} className="flex items-start space-x-3 py-3">
                         <img
-                          src={c.profileImage}
+                          src={c.profile_image}
                           alt="profile"
                           className="w-8 h-8 rounded-full border border-gray-100 dark:border-gray-600 flex-shrink-0 mt-0.5"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(c.register_time)}</p>
+                            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                              {c.user_id || c.member_id}
+                            </span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                              {formatDate(c.register_time)}
+                            </span>
                           </div>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 break-words">{c.comment}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 break-words">
+                            {c.comment}
+                          </p>
                         </div>
                       </li>
                     ))}

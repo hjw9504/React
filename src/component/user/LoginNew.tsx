@@ -25,9 +25,9 @@ export default function Login() {
   const onHandleData = (response: any) => {
     setCookie("token", response["token"]);
     setCookie("name", response["name"]);
-    setCookie("memberId", response["memberId"]);
+    setCookie("memberId", response["member_id"]);
     setCookie("role", response["role"]);
-    setCookie("userId", response["userId"]);
+    setCookie("userId", response["user_id"]);
     navigate("/mypage");
   };
 
@@ -43,8 +43,8 @@ export default function Login() {
   const onSignIn = async () => {
     try {
       const data = {
-        userId: userId,
-        userPw: userPw,
+        user_id: userId,
+        user_pw: userPw,
       };
       await fetch(`/api/user/login`, {
         method: "POST",

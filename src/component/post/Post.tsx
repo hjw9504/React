@@ -44,11 +44,11 @@ export default function Post() {
 
     const data = {
       id: 0,
-      memberId: cookie.load("memberId"),
+      member_id: cookie.load("memberId"),
       title,
       body,
-      registerTime: "",
-      modTime: "",
+      register_time: "",
+      mod_time: "",
     };
     const res = await fetch("/api/posting/register", {
       method: "POST",

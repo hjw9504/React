@@ -66,9 +66,9 @@ export default function IdpResult() {
         const user = loginData.result_data;
         setCookie("token", user.token);
         setCookie("name", user.name);
-        setCookie("memberId", user.memberId);
+        setCookie("memberId", user.member_id);
         setCookie("role", user.role);
-        setCookie("userId", user.userId);
+        setCookie("userId", user.user_id);
         window.location.href = "/mypage";
       } else {
         setStatus("로그인에 실패했습니다.");

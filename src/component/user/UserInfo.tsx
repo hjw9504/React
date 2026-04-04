@@ -31,7 +31,7 @@ export default function UserInfo() {
   }, []);
 
   const getUserInfo = async () => {
-    await fetch(`/user/info?id=ALL&memberId=${cookie.load("memberId")}`, {
+    await fetch(`/user/info?id=ALL&member_id=${cookie.load("memberId")}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

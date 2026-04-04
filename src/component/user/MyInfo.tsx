@@ -65,9 +65,9 @@ export default function Home() {
   const onChangeNickNameToServer = async () => {
     try {
       const data = {
-        memberId: cookie.load("memberId"),
-        userId: cookie.load("userId"),
-        nickName,
+        member_id: cookie.load("memberId"),
+        user_id: cookie.load("userId"),
+        nickname: nickName,
       };
       const res = await fetch(`/api/update/nickname`, {
         method: "POST",
@@ -110,7 +110,9 @@ export default function Home() {
                   <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                     {user.nickName || user.name}
                   </h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {user.email}
+                  </p>
                 </div>
               </div>
 
@@ -174,7 +176,9 @@ export default function Home() {
 
         <aside className="col-span-1 md:col-span-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
-            <h2 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">계정 정보</h2>
+            <h2 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">
+              계정 정보
+            </h2>
             <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
               <li className="flex justify-between">
                 <span className="text-gray-500 dark:text-gray-400">역할</span>

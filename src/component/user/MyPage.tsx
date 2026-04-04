@@ -33,7 +33,7 @@ interface Post {
 
 export async function myPageLoader() {
   const [postsRes, followsRes] = await Promise.all([
-    fetch(`/api/posting/all?memberId=${cookie.load("memberId")}`, {
+    fetch(`/api/posting/all?member_id=${cookie.load("memberId")}`, {
       method: "GET",
       headers: {"Content-Type": "application/json", token: cookie.load("token")},
     }),

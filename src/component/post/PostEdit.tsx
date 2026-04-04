@@ -71,11 +71,11 @@ export default function PostEdit() {
     try {
       const data = {
         id: params.postingId,
-        memberId: cookie.load("memberId"),
+        member_id: cookie.load("memberId"),
         title,
         body,
-        registerTime: post?.registerTime ?? "",
-        modTime: "",
+        register_time: post?.registerTime ?? "",
+        mod_time: "",
       };
       const res = await fetch(`/api/posting/register`, {
         method: "POST",
