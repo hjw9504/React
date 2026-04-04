@@ -4,10 +4,10 @@ import {useLoaderData, useNavigate, Link} from "react-router-dom";
 import Headers from "../utils/HeadersNew";
 
 interface Member {
-  memberId: string;
+  member_id: string;
   name: string;
-  profileImage: string;
-  likeTrue: boolean;
+  profile_image: string;
+  like_true: boolean;
 }
 
 interface Follow {
@@ -26,8 +26,8 @@ interface Post {
   title: string;
   body: string;
   likes: number;
-  commentCount: number;
-  registerTime: string;
+  comment_count: number;
+  register_time: string;
   member: Member;
 }
 
@@ -35,16 +35,24 @@ export async function myPageLoader() {
   const [postsRes, followsRes] = await Promise.all([
     fetch(`/api/posting/all?member_id=${cookie.load("memberId")}`, {
       method: "GET",
-      headers: {"Content-Type": "application/json", token: cookie.load("token")},
+      headers: {
+        "Content-Type": "application/json",
+        token: cookie.load("token"),
+      },
     }),
     fetch(`/api/follow/friends/list`, {
       method: "GET",
-      headers: {"Content-Type": "application/json", token: cookie.load("token")},
+      headers: {
+        "Content-Type": "application/json",
+        token: cookie.load("token"),
+      },
     }),
   ]);
   const postsData = await postsRes.json();
   const followsData = await followsRes.json();
-  const posts = (postsData.result_data || []).sort((a: Post, b: Post) => b.id - a.id);
+  const posts = (postsData.result_data || []).sort(
+    (a: Post, b: Post) => b.id - a.id
+  );
   const follows: Follow[] = followsData.result_data || [];
   return {posts, follows};
 }
@@ -64,16 +72,23 @@ const formatDate = (dateStr: string) => {
 };
 
 export default function MyPage() {
-  const {posts: initialPosts, follows} = useLoaderData() as {posts: Post[]; follows: Follow[]};
+  const {posts: initialPosts, follows} = useLoaderData() as {
+    posts: Post[];
+    follows: Follow[];
+  };
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [followingIds, setFollowingIds] = useState<Set<string>>(
     new Set(follows.map((f) => f.follow_member_id))
   );
   const [friendIds] = useState<Set<string>>(
-    new Set(follows.filter((f) => f.followed_time !== null).map((f) => f.follow_member_id))
+    new Set(
+      follows
+        .filter((f) => f.followed_time !== null)
+        .map((f) => f.follow_member_id)
+    )
   );
   const [likedPostIds, setLikedPostIds] = useState<Set<number>>(
-    new Set(initialPosts.filter((p) => p.member.likeTrue).map((p) => p.id))
+    new Set(initialPosts.filter((p) => p.member.like_true).map((p) => p.id))
   );
   const [followLoadingId, setFollowLoadingId] = useState<string | null>(null);
   const myMemberId = cookie.load("memberId");
@@ -87,7 +102,10 @@ export default function MyPage() {
     try {
       await fetch(isFollowing ? `/api/follow/unlink` : `/api/follow`, {
         method: "POST",
-        headers: {"Content-Type": "application/json", token: cookie.load("token")},
+        headers: {
+          "Content-Type": "application/json",
+          token: cookie.load("token"),
+        },
         body: JSON.stringify({follow_member_id: memberId}),
       });
       setFollowingIds((prev) => {
@@ -170,38 +188,45 @@ export default function MyPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <img
-                      src={post.member.profileImage}
+                      src={post.member.profile_image}
                       alt={post.member.name}
                       className="w-10 h-10 rounded-full"
                     />
-                    <span className="font-semibold text-gray-800 dark:text-gray-100">{post.member.name}</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-100">
+                      {post.member.name}
+                    </span>
                   </div>
-                  {post.member.memberId !== myMemberId && (
+                  {post.member.member_id !== myMemberId && (
                     <button
-                      onClick={(e) => handleFollow(e, post.member.memberId)}
-                      disabled={followLoadingId === post.member.memberId}
+                      onClick={(e) => handleFollow(e, post.member.member_id)}
+                      disabled={followLoadingId === post.member.member_id}
                       className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full
                         transition-all duration-200 disabled:opacity-50
-                        ${friendIds.has(post.member.memberId)
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
-                          : followingIds.has(post.member.memberId)
-                          ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
-                          : "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 border border-orange-200 dark:border-orange-700"
+                        ${
+                          friendIds.has(post.member.member_id)
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
+                            : followingIds.has(post.member.member_id)
+                            ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
+                            : "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 border border-orange-200 dark:border-orange-700"
                         }`}
                     >
-                      {followLoadingId === post.member.memberId
+                      {followLoadingId === post.member.member_id
                         ? "..."
-                        : friendIds.has(post.member.memberId)
+                        : friendIds.has(post.member.member_id)
                         ? "💚 친구"
-                        : followingIds.has(post.member.memberId)
+                        : followingIds.has(post.member.member_id)
                         ? "팔로잉 ✓"
                         : "+ 팔로우"}
                     </button>
                   )}
                 </div>
 
-                <p className="font-medium text-gray-800 dark:text-gray-100">{post.title}</p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">{post.body}</p>
+                <p className="font-medium text-gray-800 dark:text-gray-100">
+                  {post.title}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  {post.body}
+                </p>
 
                 <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-3">
@@ -209,19 +234,40 @@ export default function MyPage() {
                       onClick={(e) => handleLikes(e, post.id)}
                       className="flex items-center gap-1 transition-colors duration-200"
                     >
-                      <span className={likedPostIds.has(post.id) ? "text-rose-500" : "text-gray-400 dark:text-gray-500"}>
+                      <span
+                        className={
+                          likedPostIds.has(post.id)
+                            ? "text-rose-500"
+                            : "text-gray-400 dark:text-gray-500"
+                        }
+                      >
                         {likedPostIds.has(post.id) ? "❤️" : "🤍"}
                       </span>
-                      <span className="text-gray-500 dark:text-gray-400">{post.likes} Likes</span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        {post.likes} Likes
+                      </span>
                     </button>
                     <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 .998-.398 48.802 48.802 0 0 0 5.227-.476c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 .998-.398 48.802 48.802 0 0 0 5.227-.476c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                        />
                       </svg>
-                      <span>{post.commentCount ?? 0}</span>
+                      <span>{post.comment_count ?? 0}</span>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(post.registerTime)}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {formatDate(post.register_time)}
+                  </span>
                 </div>
               </article>
             ))
@@ -234,12 +280,20 @@ export default function MyPage() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-400 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4 text-white"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
                   <path d="M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" />
                 </svg>
                 <span className="text-white font-bold text-sm">친구 현황</span>
               </div>
-              <Link to="/friends" className="text-white/80 hover:text-white text-xs font-medium transition-colors">
+              <Link
+                to="/friends"
+                className="text-white/80 hover:text-white text-xs font-medium transition-colors"
+              >
                 전체 보기 →
               </Link>
             </div>
@@ -249,33 +303,51 @@ export default function MyPage() {
                   <p className="text-2xl font-extrabold text-orange-500 dark:text-orange-300">
                     {follows.filter((f) => f.followed_time !== null).length}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">💚 친구</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    💚 친구
+                  </p>
                 </div>
                 <div className="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-3 text-center border border-rose-100 dark:border-rose-800/30">
                   <p className="text-2xl font-extrabold text-rose-400 dark:text-rose-300">
                     {follows.filter((f) => f.followed_time === null).length}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">➡️ 팔로잉</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    ➡️ 팔로잉
+                  </p>
                 </div>
               </div>
 
               {follows.length === 0 ? (
-                <p className="text-center text-xs text-gray-400 dark:text-gray-500 py-2">아직 팔로우한 친구가 없어요</p>
+                <p className="text-center text-xs text-gray-400 dark:text-gray-500 py-2">
+                  아직 팔로우한 친구가 없어요
+                </p>
               ) : (
                 <ul className="space-y-2.5">
                   {follows.slice(0, 5).map((f) => (
-                    <li key={f.follow_member_id} className="flex items-center gap-2.5">
+                    <li
+                      key={f.follow_member_id}
+                      className="flex items-center gap-2.5"
+                    >
                       <img
                         src={f.follow_profile_image}
                         alt={f.follow_user_id}
-                        className={`flex-shrink-0 w-8 h-8 rounded-full object-cover ring-2 ${f.followed_time !== null ? "ring-green-300 dark:ring-green-600" : "ring-orange-200 dark:ring-orange-700"}`}
+                        className={`flex-shrink-0 w-8 h-8 rounded-full object-cover ring-2 ${
+                          f.followed_time !== null
+                            ? "ring-green-300 dark:ring-green-600"
+                            : "ring-orange-200 dark:ring-orange-700"
+                        }`}
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">@{f.follow_user_id}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0
-                        ${f.followed_time !== null
-                          ? "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400"
-                          : "bg-orange-100 dark:bg-orange-900/40 text-orange-500 dark:text-orange-400"
-                        }`}>
+                      <span className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">
+                        @{f.follow_user_id}
+                      </span>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0
+                        ${
+                          f.followed_time !== null
+                            ? "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400"
+                            : "bg-orange-100 dark:bg-orange-900/40 text-orange-500 dark:text-orange-400"
+                        }`}
+                      >
                         {f.followed_time !== null ? "친구" : "팔로잉"}
                       </span>
                     </li>
@@ -284,14 +356,16 @@ export default function MyPage() {
               )}
 
               {follows.length > 5 && (
-                <Link to="/friends" className="mt-3 block text-center text-xs text-gray-400 dark:text-gray-500 hover:text-orange-500 dark:hover:text-orange-400 transition-colors">
+                <Link
+                  to="/friends"
+                  className="mt-3 block text-center text-xs text-gray-400 dark:text-gray-500 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                >
                   +{follows.length - 5}명 더 보기
                 </Link>
               )}
             </div>
           </div>
         </aside>
-
       </main>
 
       {/* 채팅 플로팅 버튼 */}
@@ -306,10 +380,24 @@ export default function MyPage() {
         {/* 버튼 */}
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200"
-          style={{background: "linear-gradient(135deg, #fb923c, #f43f5e)", boxShadow: "0 8px 25px rgba(251,146,60,0.45)"}}
+          style={{
+            background: "linear-gradient(135deg, #fb923c, #f43f5e)",
+            boxShadow: "0 8px 25px rgba(251,146,60,0.45)",
+          }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+            />
           </svg>
         </div>
       </Link>

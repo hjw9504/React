@@ -4,12 +4,14 @@ import cookie from "react-cookies";
 import Headers from "../utils/HeadersNew";
 
 interface Follow {
-  memberId: string;
-  follow_id: string;
-  name: string;
-  profileImage: string;
-  follow_time: string;
+  member_id: string;
+  follow_member_id: string;
+  user_id: string;
+  follow_user_id: string;
+  register_time: string;
   followed_time: string | null;
+  profile_image: string;
+  follow_profile_image: string;
 }
 
 export async function friendsLoader() {
@@ -21,7 +23,7 @@ export async function friendsLoader() {
     },
   });
   const data = await res.json();
-  return {follows: data.resultData || []};
+  return {follows: data.result_data || []};
 }
 
 type TabType = "all" | "friends" | "following";
@@ -43,8 +45,8 @@ export default function Friends() {
       ? friends
       : onlyFollowing;
 
-  const handleUnfollow = async (memberId: string) => {
-    setUnfollowingId(memberId);
+  const handleUnfollow = async (followMemberId: string) => {
+    setUnfollowingId(followMemberId);
     try {
       await fetch(`/api/follow/unlink`, {
         method: "POST",
@@ -52,12 +54,9 @@ export default function Friends() {
           "Content-Type": "application/json",
           token: cookie.load("token"),
         },
-        body: JSON.stringify({
-          follow_member_id:
-            follows.find((f) => f.memberId === memberId)?.follow_id ?? memberId,
-        }),
+        body: JSON.stringify({follow_member_id: followMemberId}),
       });
-      setFollows((prev) => prev.filter((f) => f.memberId !== memberId));
+      setFollows((prev) => prev.filter((f) => f.follow_member_id !== followMemberId));
       setConfirmId(null);
     } catch (err) {
       console.error("unfollow error:", err);
@@ -166,12 +165,12 @@ export default function Friends() {
           ) : (
             displayed.map((f) => {
               const isFriend = f.followed_time !== null;
-              const isConfirming = confirmId === f.memberId;
-              const isProcessing = unfollowingId === f.memberId;
+              const isConfirming = confirmId === f.follow_member_id;
+              const isProcessing = unfollowingId === f.follow_member_id;
 
               return (
                 <div
-                  key={f.memberId}
+                  key={f.follow_member_id}
                   className={`bg-white dark:bg-gray-800 rounded-2xl shadow p-4 transition-all duration-200
                     ${
                       isFriend
@@ -183,8 +182,8 @@ export default function Friends() {
                     {/* 프로필 이미지 */}
                     <div className="relative flex-shrink-0">
                       <img
-                        src={f.profileImage}
-                        alt={f.name}
+                        src={f.follow_profile_image}
+                        alt={f.follow_user_id}
                         className="w-12 h-12 rounded-full border-2 border-gray-100 dark:border-gray-600"
                       />
                       <span
@@ -199,7 +198,7 @@ export default function Friends() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
-                          {f.name}
+                          {f.follow_user_id}
                         </p>
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full font-semibold
@@ -222,7 +221,7 @@ export default function Friends() {
                     {/* 언팔로우 버튼 */}
                     {!isConfirming ? (
                       <button
-                        onClick={() => setConfirmId(f.memberId)}
+                        onClick={() => setConfirmId(f.follow_member_id)}
                         className="flex-shrink-0 text-xs px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600
                                    text-gray-500 dark:text-gray-400 hover:border-red-300 hover:text-red-400
                                    dark:hover:border-red-600 dark:hover:text-red-400
@@ -241,7 +240,7 @@ export default function Friends() {
                           취소
                         </button>
                         <button
-                          onClick={() => handleUnfollow(f.follow_id)}
+                          onClick={() => handleUnfollow(f.follow_member_id)}
                           disabled={isProcessing}
                           className="text-xs px-2.5 py-1.5 rounded-xl bg-red-500 hover:bg-red-600
                                      text-white font-semibold disabled:opacity-50 transition-all duration-200"

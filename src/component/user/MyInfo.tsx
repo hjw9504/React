@@ -4,15 +4,15 @@ import cookie from "react-cookies";
 import Headers from "../utils/HeadersNew";
 
 interface User {
-  userId: string;
+  user_id: string;
   name: string;
-  email: string;
-  phone: string;
-  nickName: string;
-  registerTime: string;
-  recentLoginTime: string;
+  email?: string;
+  nickname: string;
+  register_time: string;
+  recent_login_time: string;
   role: string;
-  profileImage: string;
+  profile_image: string;
+  phone: string;
 }
 
 export async function myInfoLoader() {
@@ -32,7 +32,7 @@ export async function myInfoLoader() {
 
 export default function Home() {
   const {user} = useLoaderData() as {user: User | null};
-  const [nickName, setNickName] = useState(user?.nickName || "");
+  const [nickName, setNickName] = useState(user?.nickname || "");
   const navigate = useNavigate();
 
   const UserInfoField = ({
@@ -102,13 +102,13 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-4">
               <div className="flex items-center space-x-4 pb-4 border-b border-gray-100 dark:border-gray-700">
                 <img
-                  src={`${user.profileImage}`}
+                  src={user.profile_image}
                   alt="profile"
                   className="w-14 h-14 rounded-full border-2 border-orange-200"
                 />
                 <div>
                   <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    {user.nickName || user.name}
+                    {user.nickname || user.name}
                   </h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {user.email}
@@ -116,8 +116,8 @@ export default function Home() {
                 </div>
               </div>
 
-              <UserInfoField label="ID" value={user.userId} />
-              <UserInfoField label="Email" value={user.email} />
+              <UserInfoField label="ID" value={user.user_id} />
+              <UserInfoField label="Email" value={user.email || "-"} />
 
               <div>
                 <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
@@ -188,15 +188,18 @@ export default function Home() {
                 <span className="text-gray-500 dark:text-gray-400">가입일</span>
                 <span className="font-medium">
                   {user
-                    ? new Date(user.registerTime).toLocaleDateString("ko-KR", {
-                        timeZone: "Asia/Seoul",
-                      })
+                    ? new Date(user.register_time + "Z").toLocaleDateString(
+                        "ko-KR",
+                        {
+                          timeZone: "Asia/Seoul",
+                        }
+                      )
                     : "-"}
                 </span>
               </li>
               <li className="flex justify-between">
                 <span className="text-gray-500 dark:text-gray-400">닉네임</span>
-                <span className="font-medium">{user?.nickName ?? "-"}</span>
+                <span className="font-medium">{user?.nickname ?? "-"}</span>
               </li>
             </ul>
           </div>

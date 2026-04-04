@@ -13,10 +13,10 @@ interface Post {
   memberId: string;
   title: string;
   body: string;
-  registerTime: string;
+  register_time: string;
   modTime: string;
   name: string;
-  profileImage: string;
+  profile_image: string;
 }
 
 interface LikeUser {
@@ -28,7 +28,7 @@ interface LikeUser {
 
 interface Comment {
   member_id: string;
-  user_id?: string;
+  user_id: string;
   comment: string;
   register_time: string;
   profile_image: string;
@@ -235,7 +235,7 @@ export default function PostDetail() {
                     <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
                       <div className="flex items-center space-x-3">
                         <img
-                          src={post.profileImage}
+                          src={post.profile_image}
                           alt="profile"
                           className="w-10 h-10 rounded-full border-2 border-orange-200"
                         />
@@ -244,16 +244,17 @@ export default function PostDetail() {
                             {post.name}
                           </p>
                           <p className="text-xs text-gray-400 dark:text-gray-500">
-                            {formatDate(post.registerTime)}
+                            {formatDate(post.register_time)}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {post.modTime && post.modTime !== post.registerTime && (
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
-                            수정됨: {formatDate(post.modTime)}
-                          </p>
-                        )}
+                        {post.modTime &&
+                          post.modTime !== post.register_time && (
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                              수정됨: {formatDate(post.modTime)}
+                            </p>
+                          )}
                         {isOwner && (
                           <button
                             onClick={() => setShowDeleteConfirm((v) => !v)}
