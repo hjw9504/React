@@ -355,82 +355,135 @@ const Chat = () => {
 
   const messageAreaJsx = (
     <>
-      <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
-        {messages.map((msg, idx) =>
-          isSystemMessage(msg) ? (
-            <div key={idx} className="flex justify-center">
-              <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-                {msg.message}
-              </span>
-            </div>
-          ) : isMyMessage(msg) ? (
-            <div key={idx} className="flex justify-end gap-2 items-end">
-              <span className="text-xs text-gray-400 self-end mb-0.5">
-                {msg.time}
-              </span>
-              <div className="max-w-[85%] bg-gradient-to-br from-orange-400 to-red-500 text-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-sm">
-                <p className="text-sm leading-relaxed break-words">
+      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1 bg-gray-50 dark:bg-gray-950">
+        {messages.map((msg, idx) => {
+          const prevMsg = messages[idx - 1];
+          const isSameSender =
+            !isSystemMessage(msg) &&
+            prevMsg &&
+            !isSystemMessage(prevMsg) &&
+            prevMsg.sender === msg.sender;
+          const isLast =
+            idx === messages.length - 1 ||
+            messages[idx + 1]?.sender !== msg.sender ||
+            isSystemMessage(messages[idx + 1]);
+
+          if (isSystemMessage(msg)) {
+            if (!msg.message) return null;
+            return (
+              <div key={idx} className="flex justify-center my-2">
+                <span className="text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 px-4 py-1.5 rounded-full shadow-sm border border-gray-100 dark:border-gray-700">
                   {msg.message}
-                </p>
+                </span>
               </div>
-            </div>
-          ) : (
-            <div key={idx} className="flex gap-2 items-end">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {(msg.user_id || msg.sender || "?").charAt(0).toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 ml-1 truncate max-w-[120px]">
-                  {msg.user_id || msg.sender}
-                </p>
-                <div className="flex gap-2 items-end">
-                  <div className="max-w-[75%] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm border border-gray-100 dark:border-gray-700">
-                    <p className="text-sm leading-relaxed break-words">
-                      {msg.message}
-                    </p>
-                  </div>
-                  <span className="text-xs text-gray-400 self-end mb-0.5">
+            );
+          }
+
+          if (isMyMessage(msg)) {
+            return (
+              <div
+                key={idx}
+                className={`flex justify-end items-end gap-1.5 ${
+                  isSameSender ? "mt-0.5" : "mt-3"
+                }`}
+              >
+                {isLast && (
+                  <span className="text-[11px] text-gray-400 self-end mb-1">
                     {msg.time}
                   </span>
+                )}
+                <div
+                  className={`max-w-[75%] md:max-w-[60%] bg-gradient-to-br from-orange-400 to-rose-500 text-white px-4 py-2.5 shadow-sm text-sm leading-relaxed break-words
+                  ${
+                    isSameSender
+                      ? "rounded-2xl rounded-tr-md"
+                      : "rounded-2xl rounded-tr-sm"
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div
+              key={idx}
+              className={`flex items-end gap-2 ${
+                isSameSender ? "mt-0.5" : "mt-3"
+              }`}
+            >
+              {/* 아바타: 연속 메시지면 투명 자리만 유지 */}
+              {isLast ? (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm">
+                  {(msg.user_id || msg.sender || "?").charAt(0).toUpperCase()}
+                </div>
+              ) : (
+                <div className="w-8 flex-shrink-0" />
+              )}
+              <div className="min-w-0 max-w-[75%] md:max-w-[60%]">
+                {!isSameSender && (
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 ml-1 truncate">
+                    {msg.user_id || msg.sender}
+                  </p>
+                )}
+                <div className="flex items-end gap-1.5">
+                  <div
+                    className={`bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-2.5 shadow-sm border border-gray-100 dark:border-gray-700 text-sm leading-relaxed break-words
+                    ${
+                      isSameSender
+                        ? "rounded-2xl rounded-tl-md"
+                        : "rounded-2xl rounded-tl-sm"
+                    }`}
+                  >
+                    {msg.message}
+                  </div>
+                  {isLast && (
+                    <span className="text-[11px] text-gray-400 self-end mb-1 whitespace-nowrap">
+                      {msg.time}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
-          )
-        )}
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="px-3 py-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex gap-2 items-center">
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="메시지를 입력하세요..."
-          disabled={!connected}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition disabled:opacity-50"
-        />
-        <button
-          onClick={sendMessage}
-          disabled={!connected || !input.trim()}
-          className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-400 to-red-500 text-white disabled:opacity-40 flex items-center justify-center flex-shrink-0"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
+      <div className="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex gap-2 items-center bg-gray-50 dark:bg-gray-800 rounded-2xl px-3 py-1.5 border border-gray-200 dark:border-gray-700 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-400/20 transition-all">
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={connected ? "메시지를 입력하세요..." : "연결 중..."}
+            disabled={!connected}
+            className="flex-1 bg-transparent text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none disabled:opacity-50 py-1"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!connected || !input.trim()}
+            className="w-8 h-8 rounded-xl bg-gradient-to-r from-orange-400 to-rose-500 text-white disabled:opacity-30 flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 active:scale-95"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </>
   );
@@ -452,17 +505,18 @@ const Chat = () => {
           className="flex-1 flex flex-col md:hidden"
           style={{height: "calc(100vh - 64px)"}}
         >
-          <div className="px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+          {/* 모바일 채팅 헤더 */}
+          <div className="px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 shadow-sm">
             <button
               onClick={handleLeave}
-              className="text-gray-500 dark:text-gray-400 hover:text-orange-500 transition"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 stroke="currentColor"
               >
                 <path
@@ -472,26 +526,23 @@ const Chat = () => {
                 />
               </svg>
             </button>
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-orange-400 to-rose-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
               #
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
                 {currentRoom.name}
               </h2>
-              <p className="text-xs text-gray-400">{sender}으로 참여 중</p>
-            </div>
-            <div
-              className={`flex items-center gap-1.5 text-xs font-medium ${
-                connected ? "text-green-500" : "text-red-400"
-              }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  connected ? "bg-green-500 animate-pulse" : "bg-red-400"
-                }`}
-              />
-              {connected ? "연결됨" : "끊김"}
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    connected ? "bg-green-400 animate-pulse" : "bg-red-400"
+                  }`}
+                />
+                <p className="text-xs text-gray-400">
+                  {connected ? "연결됨" : "연결 끊김"}
+                </p>
+              </div>
             </div>
           </div>
           {messageAreaJsx}
@@ -503,42 +554,70 @@ const Chat = () => {
         className="hidden md:flex flex-1 max-w-5xl w-full mx-auto px-4 py-6 gap-4"
         style={{height: "calc(100vh - 80px)"}}
       >
-        <div className="w-64 flex-shrink-0 flex flex-col gap-3">
+        <div className="w-72 flex-shrink-0 flex flex-col gap-3">
           {roomListJsx}
         </div>
 
-        <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white text-xs font-bold">
-              #
+        <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-800">
+          {/* 데스크탑 채팅 헤더 */}
+          <div className="px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 bg-white dark:bg-gray-900">
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-orange-400 to-rose-500 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
+              {currentRoom ? "#" : "💬"}
             </div>
-            <div>
-              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
                 {currentRoom ? currentRoom.name : "채팅방을 선택하세요"}
               </h2>
-              {currentRoom && (
-                <p className="text-xs text-gray-400">{sender}으로 참여 중</p>
+              {currentRoom ? (
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      connected ? "bg-green-400 animate-pulse" : "bg-red-400"
+                    }`}
+                  />
+                  <p className="text-xs text-gray-400">
+                    {connected ? "연결됨" : "연결 끊김"}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400">
+                  왼쪽 목록에서 방을 선택하세요
+                </p>
               )}
             </div>
             {currentRoom && (
               <button
                 onClick={handleLeave}
-                className="ml-auto text-xs text-gray-400 hover:text-red-500 transition"
+                className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition px-3 py-1.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+                  />
+                </svg>
                 나가기
               </button>
             )}
           </div>
 
           {!currentRoom ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-600">
-              <div className="text-center">
+            <div className="flex-1 flex flex-col items-center justify-center gap-4 text-gray-400 dark:text-gray-600 bg-gray-50 dark:bg-gray-950">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-orange-100 to-rose-100 dark:from-orange-900/20 dark:to-rose-900/20 flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-12 h-12 mx-auto mb-3 opacity-30"
+                  className="w-10 h-10 text-orange-400 dark:text-orange-500 opacity-70"
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth={1}
+                  strokeWidth={1.5}
                   stroke="currentColor"
                 >
                   <path
@@ -547,7 +626,14 @@ const Chat = () => {
                     d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
                   />
                 </svg>
-                <p className="text-sm">왼쪽에서 채팅방을 선택하세요</p>
+              </div>
+              <div className="text-center">
+                <p className="text-base font-semibold text-gray-500 dark:text-gray-400">
+                  채팅방을 선택해보세요
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
+                  왼쪽에서 방을 선택하거나 새로 만들어보세요
+                </p>
               </div>
             </div>
           ) : (
