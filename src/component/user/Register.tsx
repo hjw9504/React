@@ -63,6 +63,10 @@ export default function Home() {
           alert("사용 가능한 ID입니다.");
           setIsChecked(true);
         }
+      })
+      .catch((error) => {
+        console.error("에러 발생:", error);
+        alert("데이터를 가져오는 중 오류가 발생했습니다.");
       });
   };
 

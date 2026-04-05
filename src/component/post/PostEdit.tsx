@@ -1,17 +1,22 @@
 import {useEffect, useState} from "react";
-import {LoaderFunctionArgs, useLoaderData, useNavigate, useParams} from "react-router-dom";
+import {
+  LoaderFunctionArgs,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Headers from "../utils/HeadersNew";
 import cookie from "react-cookies";
 
 interface Post {
   id: string;
-  memberId: string;
+  member_id: string;
   title: string;
   body: string;
-  registerTime: string;
-  modTime: string;
+  register_time: string;
+  mod_time: string;
   name: string;
-  profileImage: string;
+  profile_image: string;
 }
 
 export async function postEditLoader({params}: LoaderFunctionArgs) {
@@ -61,7 +66,7 @@ export default function PostEdit() {
     }
 
     if (
-      post?.memberId !== cookie.load("memberId") &&
+      post?.member_id !== cookie.load("memberId") &&
       cookie.load("role") !== "ADMIN"
     ) {
       setIsNotUser(true);
@@ -74,7 +79,7 @@ export default function PostEdit() {
         member_id: cookie.load("memberId"),
         title,
         body,
-        register_time: post?.registerTime ?? "",
+        register_time: post?.register_time ?? "",
         mod_time: "",
       };
       const res = await fetch(`/api/posting/register`, {
@@ -95,28 +100,28 @@ export default function PostEdit() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
       <Headers />
       <main className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl mx-auto space-y-4">
-        <div className="bg-white rounded-xl shadow p-6 space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-4">
           {/* 헤더 */}
-          <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
+          <div className="flex items-center space-x-3 pb-4 border-b border-gray-100 dark:border-gray-700">
             <img
-              src={`${post?.profileImage}`}
+              src={`${post?.profile_image}`}
               alt="profile"
               className="w-10 h-10 rounded-full border-2 border-orange-200"
             />
             <div>
-              <p className="text-sm font-semibold text-gray-800">
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                 {post?.name || "사용자"}
               </p>
-              <p className="text-xs text-gray-400">게시글 수정</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">게시글 수정</p>
             </div>
           </div>
 
           {/* 제목 */}
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
               제목
             </label>
             <input
@@ -124,15 +129,16 @@ export default function PostEdit() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="제목을 입력하세요"
-              className="block w-full rounded-lg border border-gray-200 py-2 px-3
-                         text-sm text-gray-700 bg-gray-50 shadow-sm
-                         focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200"
+              className="block w-full rounded-lg border border-gray-200 dark:border-gray-600 py-2 px-3
+                         text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 shadow-sm
+                         focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200
+                         placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
           {/* 내용 */}
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
               내용
             </label>
             <textarea
@@ -140,23 +146,24 @@ export default function PostEdit() {
               onChange={(e) => setBody(e.target.value)}
               placeholder="내용을 입력하세요"
               rows={10}
-              className="block w-full rounded-lg border border-gray-200 py-2 px-3
-                         text-sm text-gray-700 bg-gray-50 shadow-sm resize-none
-                         focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200"
+              className="block w-full rounded-lg border border-gray-200 dark:border-gray-600 py-2 px-3
+                         text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 shadow-sm resize-none
+                         focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-200
+                         placeholder-gray-400 dark:placeholder-gray-500"
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-right">
               {body.length}자
             </p>
           </div>
 
           {/* 알림 메시지 */}
           {showSuccess && (
-            <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-2 text-sm text-green-600">
+            <div className="rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 px-4 py-2 text-sm text-green-600 dark:text-green-400">
               수정이 완료되었습니다. 잠시 후 이동합니다.
             </div>
           )}
           {isNotUser && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-600">
+            <div className="rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-2 text-sm text-red-600 dark:text-red-400">
               본인의 게시글만 수정할 수 있습니다.
             </div>
           )}
@@ -165,8 +172,8 @@ export default function PostEdit() {
           <div className="grid grid-cols-2 gap-3 pt-2">
             <button
               onClick={() => navigate(`/post/detail/${params.postingId}`)}
-              className="w-full border border-gray-200 text-gray-600 font-semibold
-                         rounded-xl py-2 shadow-sm hover:bg-gray-50 transition-all duration-300"
+              className="w-full border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-semibold
+                         rounded-xl py-2 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
             >
               취소
             </button>

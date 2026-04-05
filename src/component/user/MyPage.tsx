@@ -91,8 +91,27 @@ export default function MyPage() {
     new Set(initialPosts.filter((p) => p.member.like_true).map((p) => p.id))
   );
   const [followLoadingId, setFollowLoadingId] = useState<string | null>(null);
+  const [menuPostId, setMenuPostId] = useState<number | null>(null);
+  const [deleteModalId, setDeleteModalId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const myMemberId = cookie.load("memberId");
   const navigate = useNavigate();
+
+  const handleDelete = async (postId: number) => {
+    setDeletingId(postId);
+    try {
+      await fetch(`/api/posting/${postId}`, {
+        method: "DELETE",
+        headers: {token: cookie.load("token")},
+      });
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+    } catch (err) {
+      console.error("delete error:", err);
+    } finally {
+      setDeletingId(null);
+      setDeleteModalId(null);
+    }
+  };
 
   const handleFollow = async (e: React.MouseEvent, memberId: string) => {
     e.stopPropagation();
@@ -196,29 +215,41 @@ export default function MyPage() {
                       {post.member.name}
                     </span>
                   </div>
-                  {post.member.member_id !== myMemberId && (
-                    <button
-                      onClick={(e) => handleFollow(e, post.member.member_id)}
-                      disabled={followLoadingId === post.member.member_id}
-                      className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full
-                        transition-all duration-200 disabled:opacity-50
-                        ${
-                          friendIds.has(post.member.member_id)
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
-                            : followingIds.has(post.member.member_id)
-                            ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
-                            : "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 border border-orange-200 dark:border-orange-700"
-                        }`}
-                    >
-                      {followLoadingId === post.member.member_id
-                        ? "..."
-                        : friendIds.has(post.member.member_id)
-                        ? "💚 친구"
-                        : followingIds.has(post.member.member_id)
-                        ? "팔로잉 ✓"
-                        : "+ 팔로우"}
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {post.member.member_id !== myMemberId ? (
+                      <button
+                        onClick={(e) => handleFollow(e, post.member.member_id)}
+                        disabled={followLoadingId === post.member.member_id}
+                        className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full
+                          transition-all duration-200 disabled:opacity-50
+                          ${
+                            friendIds.has(post.member.member_id)
+                              ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
+                              : followingIds.has(post.member.member_id)
+                              ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-400"
+                              : "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 border border-orange-200 dark:border-orange-700"
+                          }`}
+                      >
+                        {followLoadingId === post.member.member_id
+                          ? "..."
+                          : friendIds.has(post.member.member_id)
+                          ? "💚 친구"
+                          : followingIds.has(post.member.member_id)
+                          ? "팔로잉 ✓"
+                          : "+ 팔로우"}
+                      </button>
+                    ) : (
+                      /* 내 글 ··· 버튼 */
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMenuPostId(post.id); }}
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <p className="font-medium text-gray-800 dark:text-gray-100">
@@ -401,6 +432,95 @@ export default function MyPage() {
           </svg>
         </div>
       </Link>
+
+      {/* ··· 바텀시트 (인스타 스타일) */}
+      {menuPostId !== null && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setMenuPostId(null)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-t-3xl pb-8 pt-3 px-4 shadow-2xl animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 핸들 바 */}
+            <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-5" />
+
+            <div className="space-y-1">
+              <button
+                onClick={() => { setMenuPostId(null); navigate(`/post/edit/${menuPostId}`); }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition text-left"
+              >
+                <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">수정하기</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">게시글을 편집합니다</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => { setMenuPostId(null); setDeleteModalId(menuPostId); }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl hover:bg-red-50 dark:hover:bg-red-900/10 transition text-left"
+              >
+                <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-red-500">삭제하기</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">게시글을 영구 삭제합니다</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setMenuPostId(null)}
+                className="w-full mt-2 py-3.5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 삭제 확인 모달 (페북 스타일) */}
+      {deleteModalId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => setDeleteModalId(null)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 text-center space-y-2">
+              <div className="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">게시글을 삭제할까요?</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">삭제된 게시글은 복구할 수 없습니다.</p>
+            </div>
+            <div className="border-t border-gray-100 dark:border-gray-800 grid grid-cols-2">
+              <button
+                onClick={() => setDeleteModalId(null)}
+                className="py-4 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition border-r border-gray-100 dark:border-gray-800"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => handleDelete(deleteModalId)}
+                disabled={deletingId === deleteModalId}
+                className="py-4 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition disabled:opacity-50"
+              >
+                {deletingId === deleteModalId ? "삭제 중..." : "삭제"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

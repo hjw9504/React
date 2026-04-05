@@ -10,20 +10,20 @@ import cookie from "react-cookies";
 
 interface Post {
   id: string;
-  memberId: string;
+  member_id: string;
   title: string;
   body: string;
   register_time: string;
-  modTime: string;
+  mod_time: string;
   name: string;
   profile_image: string;
 }
 
 interface LikeUser {
-  memberId: string;
-  userId: string;
+  member_id: string;
+  user_id: string;
   name: string;
-  profileImage: string;
+  profile_image: string;
 }
 
 interface Comment {
@@ -58,12 +58,12 @@ export default function PostDetail() {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentSubmitting, setCommentSubmitting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
-  const isOwner = post?.memberId === cookie.load("memberId");
+  const isOwner = post?.member_id === cookie.load("memberId") || cookie.load("role") === "ADMIN";
 
   useEffect(() => {
     if (!isNotUser) return;
@@ -164,13 +164,13 @@ export default function PostDetail() {
     } catch (err) {
       console.error("deletePost error:", err);
       setIsDeleting(false);
-      setShowDeleteConfirm(false);
+      setShowDeleteModal(false);
     }
   };
 
   const onEditPost = () => {
     if (
-      post?.memberId !== cookie.load("memberId") &&
+      post?.member_id !== cookie.load("memberId") &&
       cookie.load("role") !== "ADMIN"
     ) {
       setIsNotUser(true);
@@ -249,15 +249,15 @@ export default function PostDetail() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {post.modTime &&
-                          post.modTime !== post.register_time && (
+                        {post.mod_time &&
+                          post.mod_time !== post.register_time && (
                             <p className="text-xs text-gray-400 dark:text-gray-500">
-                              수정됨: {formatDate(post.modTime)}
+                              수정됨: {formatDate(post.mod_time)}
                             </p>
                           )}
                         {isOwner && (
                           <button
-                            onClick={() => setShowDeleteConfirm((v) => !v)}
+                            onClick={() => setShowDeleteModal(true)}
                             title="게시글 삭제"
                             className="flex items-center justify-center w-8 h-8 rounded-lg
                                        bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/50
@@ -294,33 +294,6 @@ export default function PostDetail() {
                     {isNotUser && (
                       <div className="rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-2 text-sm text-red-600 dark:text-red-400">
                         본인의 게시글만 수정할 수 있습니다.
-                      </div>
-                    )}
-
-                    {showDeleteConfirm && (
-                      <div className="rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-3 space-y-3">
-                        <p className="text-sm font-semibold text-red-600 dark:text-red-400 text-center">
-                          정말 이 게시글을 삭제하시겠습니까?
-                        </p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={() => setShowDeleteConfirm(false)}
-                            className="w-full border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300
-                                       font-semibold rounded-xl py-2 text-sm
-                                       hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
-                          >
-                            취소
-                          </button>
-                          <button
-                            onClick={onDeletePost}
-                            disabled={isDeleting}
-                            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold
-                                       rounded-xl py-2 text-sm shadow-sm
-                                       disabled:opacity-50 transition-all duration-300"
-                          >
-                            {isDeleting ? "삭제 중..." : "삭제 확인"}
-                          </button>
-                        </div>
                       </div>
                     )}
 
@@ -378,11 +351,11 @@ export default function PostDetail() {
                       <ul className="divide-y divide-gray-50 dark:divide-gray-700">
                         {likeUsers.map((u) => (
                           <li
-                            key={u.memberId}
+                            key={u.member_id}
                             className="flex items-center space-x-3 py-3"
                           >
                             <img
-                              src={u.profileImage}
+                              src={u.profile_image}
                               alt={u.name}
                               className="w-10 h-10 rounded-full border border-gray-100 dark:border-gray-600"
                             />
@@ -391,7 +364,7 @@ export default function PostDetail() {
                                 {u.name}
                               </p>
                               <p className="text-xs text-gray-400 dark:text-gray-500">
-                                @{u.userId}
+                                @{u.user_id}
                               </p>
                             </div>
                           </li>
@@ -492,6 +465,60 @@ export default function PostDetail() {
           </>
         ) : null}
       </main>
+
+      {/* 삭제 확인 모달 */}
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 text-center space-y-2">
+              <div className="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-7 h-7 text-red-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                게시글을 삭제할까요?
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                삭제된 게시글은 복구할 수 없습니다.
+              </p>
+            </div>
+            <div className="border-t border-gray-100 dark:border-gray-800 grid grid-cols-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="py-4 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition border-r border-gray-100 dark:border-gray-800"
+              >
+                취소
+              </button>
+              <button
+                onClick={onDeletePost}
+                disabled={isDeleting}
+                className="py-4 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition disabled:opacity-50"
+              >
+                {isDeleting ? "삭제 중..." : "삭제"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
