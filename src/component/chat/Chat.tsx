@@ -8,7 +8,7 @@ interface ChattingDto {
   type: "ENTER" | "TALK" | "LEAVE";
   room_id?: number;
   room_name?: string;
-  token?: string;
+  access_token?: string;
   sender: string;
   message: string;
   member_id?: string;
@@ -51,7 +51,7 @@ const Chat = () => {
   const currentRoomRef = useRef<ChatRoom | null>(null);
   const sender = cookie.load("userId") || cookie.load("name") || "익명";
   const memberId = cookie.load("memberId") || "";
-  const token = cookie.load("token") ?? "";
+  const access_token = cookie.load("accessToken") ?? "";
 
   useEffect(() => {
     currentRoomRef.current = currentRoom ?? null;
@@ -61,7 +61,7 @@ const Chat = () => {
     try {
       const res = await fetch("/api/chat/room", {
         method: "GET",
-        headers: {"Content-Type": "application/json", token},
+        headers: {"Content-Type": "application/json", Authorization: "Bearer " + access_token},
       });
       const data = await res.json();
       setRooms(data.result_data || []);
@@ -79,7 +79,7 @@ const Chat = () => {
     try {
       const res = await fetch(`/api/chat/message?room_id=${roomId}`, {
         method: "GET",
-        headers: {"Content-Type": "application/json", token},
+        headers: {"Content-Type": "application/json", Authorization: "Bearer " + access_token},
       });
       const data = await res.json();
       const history: ChatHistoryItem[] = data.result_data || [];
@@ -116,7 +116,7 @@ const Chat = () => {
     try {
       const res = await fetch("/api/chat/room", {
         method: "POST",
-        headers: {"Content-Type": "application/json", token},
+        headers: {"Content-Type": "application/json", Authorization: "Bearer " + access_token},
         body: JSON.stringify({room_name: newRoomName.trim()}),
       });
       if (res.ok) {
@@ -164,7 +164,7 @@ const Chat = () => {
           room_id: room.room_id,
           room_name: room.name,
           member_id: memberId,
-          token,
+          access_token,
           sender,
           message: "",
         }),
@@ -206,7 +206,7 @@ const Chat = () => {
         room_id: room.room_id,
         room_name: room.name,
         member_id: memberId,
-        token,
+        access_token,
         sender,
         message: "",
       }),
@@ -228,7 +228,7 @@ const Chat = () => {
         room_id: currentRoom.room_id,
         room_name: currentRoom.name,
         member_id: memberId,
-        token,
+        access_token,
         sender,
         message: input.trim(),
       }),

@@ -10,7 +10,7 @@ export async function postLoader() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        token: cookie.load("token"),
+        Authorization: "Bearer " + cookie.load("accessToken"),
       },
     }
   );
@@ -54,7 +54,7 @@ export default function Post() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        token: cookie.load("token"),
+        Authorization: "Bearer " + cookie.load("accessToken"),
       },
       body: JSON.stringify(data),
     });
@@ -88,7 +88,9 @@ export default function Post() {
                 <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                   {cookie.load("name") || "사용자"}
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500">새 게시글 작성</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  새 게시글 작성
+                </p>
               </div>
             </div>
 
@@ -132,7 +134,8 @@ export default function Post() {
             {/* 이미지 첨부 */}
             <div>
               <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                이미지 첨부 <span className="text-gray-400 dark:text-gray-500">(선택)</span>
+                이미지 첨부{" "}
+                <span className="text-gray-400 dark:text-gray-500">(선택)</span>
               </label>
               <input
                 type="file"

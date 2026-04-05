@@ -20,11 +20,12 @@ interface Post {
 }
 
 export async function postEditLoader({params}: LoaderFunctionArgs) {
+  const accessToken = cookie.load("accessToken") ?? "";
   const res = await fetch(`/api/posting/detail/${params.postingId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      token: cookie.load("token"),
+      Authorization: `Bearer ${accessToken}`,
     },
   });
   const data = await res.json();
@@ -86,7 +87,7 @@ export default function PostEdit() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
         body: JSON.stringify(data),
       });
@@ -115,7 +116,9 @@ export default function PostEdit() {
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                 {post?.name || "사용자"}
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">게시글 수정</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                게시글 수정
+              </p>
             </div>
           </div>
 

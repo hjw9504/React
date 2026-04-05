@@ -16,13 +16,15 @@ interface User {
 }
 
 export async function myInfoLoader() {
+  const accessToken = cookie.load("accessToken") ?? "";
+  const memberId = cookie.load("memberId") ?? "";
   const res = await fetch(
-    `/api/user/info?member_id=${cookie.load("memberId")}`,
+    `/api/user/info?member_id=${memberId}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        token: cookie.load("token"),
+        Authorization: `Bearer ${accessToken}`,
       },
     }
   );
@@ -73,7 +75,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
         body: JSON.stringify(data),
       });

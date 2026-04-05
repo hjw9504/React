@@ -24,8 +24,8 @@ export default function MyPage() {
   });
 
   const checkLogin = () => {
-    const token = cookie.load("token");
-    if (token === undefined) {
+    const accessToken = cookie.load("accessToken");
+    if (accessToken === undefined) {
       setIsLogin(false);
       navigate("login");
     }

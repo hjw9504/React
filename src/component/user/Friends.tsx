@@ -15,11 +15,12 @@ interface Follow {
 }
 
 export async function friendsLoader() {
+  const accessToken = cookie.load("accessToken") ?? "";
   const res = await fetch(`/api/follow/friends/list`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      token: cookie.load("token"),
+      Authorization: `Bearer ${accessToken}`,
     },
   });
   const data = await res.json();
@@ -52,11 +53,13 @@ export default function Friends() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
         body: JSON.stringify({follow_member_id: followMemberId}),
       });
-      setFollows((prev) => prev.filter((f) => f.follow_member_id !== followMemberId));
+      setFollows((prev) =>
+        prev.filter((f) => f.follow_member_id !== followMemberId)
+      );
       setConfirmId(null);
     } catch (err) {
       console.error("unfollow error:", err);

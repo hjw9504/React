@@ -13,14 +13,14 @@ React + TypeScript로 구축된 소셜 미디어/블로깅 웹 애플리케이�
 
 ## 기술 스택
 
-| 분류 | 기술 |
-|------|------|
-| Framework | React 18, TypeScript |
-| Routing | React Router DOM 6 |
-| Styling | Tailwind CSS, DaisyUI, Material Tailwind |
-| Auth | 쿠키 기반 JWT, Kakao OAuth |
-| HTTP | Fetch API |
-| Deploy | AWS EC2 (Ubuntu) |
+| 분류      | 기술                                     |
+| --------- | ---------------------------------------- |
+| Framework | React 18, TypeScript                     |
+| Routing   | React Router DOM 6                       |
+| Styling   | Tailwind CSS, DaisyUI, Material Tailwind |
+| Auth      | 쿠키 기반 JWT, Kakao OAuth               |
+| HTTP      | Fetch API                                |
+| Deploy    | AWS EC2 (Ubuntu)                         |
 
 ## 시작하기
 
@@ -68,19 +68,19 @@ src/
 
 ## 라우팅
 
-| 경로 | 설명 |
-|------|------|
-| `/` | 메인 피드 (리다이렉트) |
-| `/login` | 로그인 |
-| `/register` | 회원가입 |
-| `/reset/password` | 비밀번호 재설정 |
-| `/mypage` | 게시글 피드 |
-| `/myinfo` | 내 프로필 |
-| `/post` | 게시글 작성 |
+| 경로               | 설명                      |
+| ------------------ | ------------------------- |
+| `/`                | 메인 피드 (리다이렉트)    |
+| `/login`           | 로그인                    |
+| `/register`        | 회원가입                  |
+| `/reset/password`  | 비밀번호 재설정           |
+| `/mypage`          | 게시글 피드               |
+| `/myinfo`          | 내 프로필                 |
+| `/post`            | 게시글 작성               |
 | `/post/detail/:id` | 게시글 상세 (좋아요/댓글) |
-| `/post/edit/:id` | 게시글 수정 |
-| `/user/:id` | 유저 프로필 |
-| `/idp/result` | OAuth 콜백 |
+| `/post/edit/:id`   | 게시글 수정               |
+| `/user/:id`        | 유저 프로필               |
+| `/idp/result`      | OAuth 콜백                |
 
 ## 환경 변수
 
@@ -94,10 +94,10 @@ REACT_APP_AUTH_SERVER=<백엔드 서버 URL>
 
 로그인 성공 시 쿠키에 다음 정보를 저장합니다 (60분 만료):
 
-| 쿠키 | 설명 |
-|------|------|
-| `token` | 인증 토큰 |
-| `name` | 사용자 이름 |
-| `memberId` | 사용자 ID |
-| `role` | 권한 (USER / ADMIN) |
-| `userId` | 로그인 아이디 |
+| 쿠키           | 설명                |
+| -------------- | ------------------- |
+| `access_token` | 인증 토큰           |
+| `name`         | 사용자 이름         |
+| `memberId`     | 사용자 ID           |
+| `role`         | 권한 (USER / ADMIN) |
+| `userId`       | 로그인 아이디       |

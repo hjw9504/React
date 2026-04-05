@@ -29,12 +29,12 @@ const Headers = () => {
   }, []);
 
   const checkLogin = () => {
-    const token = cookie.load("token");
-    if (!token) navigate("/login");
+    const accessToken = cookie.load("accessToken");
+    if (!accessToken) navigate("/login");
   };
 
   const logout = () => {
-    cookie.remove("token");
+    cookie.remove("accessToken");
     cookie.remove("name");
     cookie.remove("memberId");
     cookie.remove("role");

@@ -5,7 +5,7 @@ import Alert from "../utils/Alert";
 
 export default function Login() {
   const [data, setData] = useState(false);
-  const [userToken, setUserToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
   const [isLoginFail, setIsLoginFail] = useState(false);
@@ -15,8 +15,8 @@ export default function Login() {
 
   useEffect(() => {
     // check login
-    const token = cookie.load("token");
-    if (token !== undefined) {
+    const access_token = cookie.load("accessToken");
+    if (access_token !== undefined) {
       navigate("/mypage");
     }
 
@@ -31,7 +31,7 @@ export default function Login() {
   const onHandleData = (response: any) => {
     console.log("Login Success: ", response);
     setData(response);
-    setCookie("token", response["token"]);
+    setCookie("accessToken", response["access_token"]);
     setCookie("name", response["name"]);
     setCookie("memberId", response["member_id"]);
     setCookie("role", response["role"]);
@@ -65,7 +65,7 @@ export default function Login() {
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.error_code === 200) {
+          if (res.error_code === 0) {
             onHandleData(res.result_data);
           } else {
             setIsLoginFail(true);

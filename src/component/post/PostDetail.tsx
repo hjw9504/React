@@ -35,11 +35,12 @@ interface Comment {
 }
 
 export async function postDetailLoader({params}: LoaderFunctionArgs) {
+  const accessToken = cookie.load("accessToken") ?? "";
   const res = await fetch(`/api/posting/detail/${params.postingId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      token: cookie.load("token"),
+      Authorization: `Bearer ${accessToken}`,
     },
   });
   const data = await res.json();
@@ -63,7 +64,9 @@ export default function PostDetail() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const isOwner = post?.member_id === cookie.load("memberId") || cookie.load("role") === "ADMIN";
+  const isOwner =
+    post?.member_id === cookie.load("memberId") ||
+    cookie.load("role") === "ADMIN";
 
   useEffect(() => {
     if (!isNotUser) return;
@@ -83,7 +86,7 @@ export default function PostDetail() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
       });
       const data = await res.json();
@@ -102,7 +105,7 @@ export default function PostDetail() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
       });
       const data = await res.json();
@@ -128,7 +131,7 @@ export default function PostDetail() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
         body: JSON.stringify({
           member_id: cookie.load("memberId"),
@@ -157,7 +160,7 @@ export default function PostDetail() {
       await fetch(`/api/posting/${params.postingId}`, {
         method: "DELETE",
         headers: {
-          token: cookie.load("token"),
+          Authorization: "Bearer " + cookie.load("accessToken"),
         },
       });
       navigate("/mypage");

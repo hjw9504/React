@@ -28,9 +28,7 @@ export default function Terms() {
     if (!value) setAgreeAll(false);
     else {
       setTimeout(() => {
-        setAgreeAll(
-          agreeService && agreePrivacy && agreeAge
-        );
+        setAgreeAll(agreeService && agreePrivacy && agreeAge);
       }, 0);
     }
   };
@@ -47,7 +45,10 @@ export default function Terms() {
     if (fromIdp) {
       // IDP 회원가입 처리
       const stored = sessionStorage.getItem("idp_pending");
-      if (!stored) { navigate("/login"); return; }
+      if (!stored) {
+        navigate("/login");
+        return;
+      }
       const {accessToken, idpType} = JSON.parse(stored);
       setIsProcessing(true);
 
@@ -57,12 +58,16 @@ export default function Terms() {
       try {
         await fetch(`/api/user/idp/register`, {method: "POST", headers, body});
 
-        const loginRes = await fetch(`/api/user/idp/login`, {method: "POST", headers, body});
+        const loginRes = await fetch(`/api/user/idp/login`, {
+          method: "POST",
+          headers,
+          body,
+        });
         const loginData = await loginRes.json();
 
         if (loginData.error_code === 0) {
           const user = loginData.result_data;
-          setCookie("token", user.token);
+          setCookie("accessToken", user.access_token);
           setCookie("name", user.name);
           setCookie("memberId", user.member_id);
           setCookie("role", user.role);
@@ -138,12 +143,12 @@ export default function Terms() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-400 px-6 py-5">
           <h1 className="text-xl font-extrabold text-white">서비스 이용약관</h1>
           <p className="text-sm text-white/80 mt-1">
-            {fromIdp ? "카카오 계정으로 가입하기 전" : "회원가입 전"} 약관에 동의해주세요
+            {fromIdp ? "카카오 계정으로 가입하기 전" : "회원가입 전"} 약관에
+            동의해주세요
           </p>
         </div>
 
@@ -157,8 +162,12 @@ export default function Terms() {
               className="w-5 h-5 rounded accent-orange-500 cursor-pointer"
             />
             <div>
-              <p className="text-sm font-bold text-gray-800 dark:text-gray-100">전체 동의</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">필수 약관에 모두 동의합니다</p>
+              <p className="text-sm font-bold text-gray-800 dark:text-gray-100">
+                전체 동의
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                필수 약관에 모두 동의합니다
+              </p>
             </div>
           </label>
 
@@ -168,12 +177,17 @@ export default function Terms() {
           {/* 개별 약관 */}
           <div className="space-y-3">
             {sections.map((s) => (
-              <div key={s.key} className="border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden">
+              <div
+                key={s.key}
+                className="border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden"
+              >
                 <div className="flex items-center gap-3 p-4">
                   <input
                     type="checkbox"
                     checked={s.checked}
-                    onChange={(e) => handleIndividual(s.setter, e.target.checked)}
+                    onChange={(e) =>
+                      handleIndividual(s.setter, e.target.checked)
+                    }
                     className="w-4 h-4 rounded accent-orange-500 cursor-pointer flex-shrink-0"
                   />
                   <span className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -181,7 +195,11 @@ export default function Terms() {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setExpandedSection(expandedSection === s.key ? null : s.key)}
+                    onClick={() =>
+                      setExpandedSection(
+                        expandedSection === s.key ? null : s.key
+                      )
+                    }
                     className="text-xs text-gray-400 dark:text-gray-500 hover:text-orange-500 flex-shrink-0 transition-colors"
                   >
                     {expandedSection === s.key ? "접기 ▲" : "보기 ▼"}
@@ -203,12 +221,17 @@ export default function Terms() {
             onClick={handleProceed}
             disabled={!canProceed || isProcessing}
             className={`w-full py-3 rounded-xl font-bold text-sm transition-all duration-300 mt-2
-              ${canProceed
-                ? "bg-gradient-to-r from-orange-400 to-rose-400 hover:from-orange-500 hover:to-rose-500 text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+              ${
+                canProceed
+                  ? "bg-gradient-to-r from-orange-400 to-rose-400 hover:from-orange-500 hover:to-rose-500 text-white shadow-md"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
               }`}
           >
-            {isProcessing ? "처리 중..." : canProceed ? "동의하고 시작하기 →" : "필수 약관에 모두 동의해주세요"}
+            {isProcessing
+              ? "처리 중..."
+              : canProceed
+              ? "동의하고 시작하기 →"
+              : "필수 약관에 모두 동의해주세요"}
           </button>
 
           {/* 뒤로가기 */}

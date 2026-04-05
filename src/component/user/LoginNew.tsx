@@ -9,8 +9,8 @@ export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = cookie.load("token");
-    if (token !== undefined) {
+    const accessToken = cookie.load("accessToken");
+    if (accessToken !== undefined) {
       navigate("/mypage");
     }
 
@@ -23,7 +23,7 @@ export default function Login() {
   }, [isLoginFail]);
 
   const onHandleData = (response: any) => {
-    setCookie("token", response["token"]);
+    setCookie("accessToken", response["access_token"]);
     setCookie("name", response["name"]);
     setCookie("memberId", response["member_id"]);
     setCookie("role", response["role"]);

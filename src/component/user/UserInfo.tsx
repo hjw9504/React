@@ -35,7 +35,7 @@ export default function UserInfo() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        token: cookie.load("token"),
+        Authorization: "Bearer " + cookie.load("accessToken"),
       },
     })
       .then((res) => res.json())

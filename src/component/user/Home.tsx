@@ -12,8 +12,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const token = cookie.load("token");
-    if (token === undefined) {
+    const access_token = cookie.load("accessToken");
+    if (access_token === undefined) {
       navigate("/login");
     }
   });

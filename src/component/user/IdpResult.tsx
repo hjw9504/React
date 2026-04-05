@@ -14,27 +14,28 @@ export default function IdpResult() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("access_token");
+    const idpToken = params.get("idp_token");
     const idpType = params.get("idp_type");
-    const token = params.get("token") || cookie.load("token") || "";
+    const accessToken =
+      params.get("access_token") || cookie.load("accessToken") || "";
 
-    if (!accessToken || !idpType) {
+    if (!idpToken || !idpType) {
       navigate("/login");
       return;
     }
 
-    handleIdpLogin(accessToken, idpType, token);
+    handleIdpLogin(idpToken, idpType, accessToken);
   }, []);
 
   const handleIdpLogin = async (
-    accessToken: string,
-    idpType: string,
-    token: string
+    idp_token: string,
+    idp_type: string,
+    accessToken: string
   ) => {
-    const body = JSON.stringify({idpType, accessToken});
+    const body = JSON.stringify({idp_type, idp_token});
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...(token ? {token} : {}),
+      ...(accessToken ? {accessToken} : {}),
     };
 
     try {
@@ -48,7 +49,10 @@ export default function IdpResult() {
 
       // 2. 미가입이면 약관 동의 페이지로 이동
       if (checkData.result_data === false) {
-        sessionStorage.setItem("idp_pending", JSON.stringify({accessToken, idpType}));
+        sessionStorage.setItem(
+          "idp_pending",
+          JSON.stringify({idp_token, idp_type})
+        );
         navigate("/terms?from=idp");
         return;
       }
@@ -64,7 +68,7 @@ export default function IdpResult() {
 
       if (loginData.error_code === 0) {
         const user = loginData.result_data;
-        setCookie("token", user.token);
+        setCookie("accessToken", user.access_token);
         setCookie("name", user.name);
         setCookie("memberId", user.member_id);
         setCookie("role", user.role);
