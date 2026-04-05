@@ -1,6 +1,7 @@
 import {useEffect, useLayoutEffect, useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import cookie from "react-cookies";
+import {useTokenRefresh} from "./useTokenRefresh";
 
 const Headers = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -9,6 +10,7 @@ const Headers = () => {
     () => localStorage.getItem("theme") === "dark"
   );
   const navigate = useNavigate();
+  useTokenRefresh();
 
   useEffect(() => {
     checkLogin();
@@ -55,6 +57,7 @@ const Headers = () => {
 
   const logout = () => {
     cookie.remove("accessToken");
+    cookie.remove("refreshToken");
     cookie.remove("name");
     cookie.remove("memberId");
     cookie.remove("role");

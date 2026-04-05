@@ -49,10 +49,10 @@ export default function Terms() {
         navigate("/login");
         return;
       }
-      const {accessToken, idpType} = JSON.parse(stored);
+      const {idp_token, idpType} = JSON.parse(stored);
       setIsProcessing(true);
 
-      const body = JSON.stringify({idpType, accessToken});
+      const body = JSON.stringify({idpType, idp_token});
       const headers = {"Content-Type": "application/json"};
 
       try {
@@ -68,6 +68,7 @@ export default function Terms() {
         if (loginData.error_code === 0) {
           const user = loginData.result_data;
           setCookie("accessToken", user.access_token);
+          setCookie("refreshToken", user.refresh_token);
           setCookie("name", user.name);
           setCookie("memberId", user.member_id);
           setCookie("role", user.role);

@@ -24,6 +24,7 @@ export default function Login() {
 
   const onHandleData = (response: any) => {
     setCookie("accessToken", response["access_token"]);
+    setCookie("refreshToken", response["refresh_token"]);
     setCookie("name", response["name"]);
     setCookie("memberId", response["member_id"]);
     setCookie("role", response["role"]);

@@ -32,6 +32,7 @@ export default function Login() {
     console.log("Login Success: ", response);
     setData(response);
     setCookie("accessToken", response["access_token"]);
+    setCookie("refreshToken", response["refresh_token"]);
     setCookie("name", response["name"]);
     setCookie("memberId", response["member_id"]);
     setCookie("role", response["role"]);

@@ -24,18 +24,16 @@ export default function IdpResult() {
       return;
     }
 
-    handleIdpLogin(idpToken, idpType, accessToken);
+    handleIdpLogin(idpToken, idpType);
   }, []);
 
   const handleIdpLogin = async (
     idp_token: string,
-    idp_type: string,
-    accessToken: string
+    idpType: string,
   ) => {
-    const body = JSON.stringify({idp_type, idp_token});
+    const body = JSON.stringify({idpType, idp_token});
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...(accessToken ? {accessToken} : {}),
     };
 
     try {
@@ -51,7 +49,7 @@ export default function IdpResult() {
       if (checkData.result_data === false) {
         sessionStorage.setItem(
           "idp_pending",
-          JSON.stringify({idp_token, idp_type})
+          JSON.stringify({idp_token, idpType})
         );
         navigate("/terms?from=idp");
         return;
@@ -69,6 +67,7 @@ export default function IdpResult() {
       if (loginData.error_code === 0) {
         const user = loginData.result_data;
         setCookie("accessToken", user.access_token);
+        setCookie("refreshToken", user.refresh_token);
         setCookie("name", user.name);
         setCookie("memberId", user.member_id);
         setCookie("role", user.role);
