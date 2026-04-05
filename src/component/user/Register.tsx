@@ -118,16 +118,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4 transition-colors duration-200">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
           회원가입
         </h1>
 
         <form className="space-y-4">
           {/* USER ID */}
           <div>
-            <label className="text-sm text-gray-600">아이디</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">아이디</label>
             <div className="flex gap-2 mt-1">
               <input
                 type="text"
@@ -136,16 +136,18 @@ export default function Home() {
                 disabled={isChecked}
                 placeholder="아이디 입력"
                 required
-                className="w-2/3 px-3 py-2 border border-rose-200 rounded-lg 
-                       bg-white focus:outline-none focus:ring-2 
-                       focus:ring-rose-300 transition-all duration-200"
+                className="w-2/3 px-3 py-2 border border-rose-200 dark:border-gray-600 rounded-lg
+                       bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                       placeholder-gray-400 dark:placeholder-gray-500
+                       focus:outline-none focus:ring-2 focus:ring-rose-300
+                       disabled:opacity-60 transition-all duration-200"
               />
               <button
                 type="button"
                 onClick={checkUserId}
-                className="w-1/3 bg-gradient-to-r from-rose-300 to-orange-300 
+                className="w-1/3 bg-gradient-to-r from-rose-300 to-orange-300
                        hover:from-rose-400 hover:to-orange-400
-                       text-white font-semibold rounded-lg py-2 shadow-md 
+                       text-white font-semibold rounded-lg py-2 shadow-md
                        transition-all duration-300"
               >
                 중복 확인
@@ -155,42 +157,46 @@ export default function Home() {
 
           {/* PASSWORD */}
           <div>
-            <label className="text-sm text-gray-600">비밀번호</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">비밀번호</label>
             <input
               type="password"
               placeholder="비밀번호 입력"
               value={userPw}
               onChange={saveUserPw}
               required
-              className="w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
-                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+              className="w-full px-3 py-2 border border-rose-200 dark:border-gray-600 rounded-lg
+                     bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                     placeholder-gray-400 dark:placeholder-gray-500
+                     focus:outline-none focus:ring-2 focus:ring-rose-300
                      transition-all duration-200"
             />
           </div>
 
           {/* PASSWORD CHECK */}
           <div>
-            <label className="text-sm text-gray-600">비밀번호 체크</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">비밀번호 체크</label>
             <input
               type="password"
               placeholder="비밀번호 입력"
               value={userPwCheck}
               onChange={saveUserPwCheck}
               required
-              className={`w-full px-3 py-2 border rounded-lg bg-white
+              className={`w-full px-3 py-2 border rounded-lg
+                     bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                     placeholder-gray-400 dark:placeholder-gray-500
                      focus:outline-none focus:ring-2
                      transition-all duration-200 ${
                        userPwCheck === ""
-                         ? "border-rose-200 focus:ring-rose-300"
+                         ? "border-rose-200 dark:border-gray-600 focus:ring-rose-300"
                          : isMatch
-                         ? "border-green-400 focus:ring-green-300"
-                         : "border-red-400 focus:ring-red-300"
+                         ? "border-green-400 dark:border-green-500 focus:ring-green-300"
+                         : "border-red-400 dark:border-red-500 focus:ring-red-300"
                      }`}
             />
             {userPwCheck !== "" && (
               <p
                 className={`text-xs mt-1 ${
-                  isMatch ? "text-green-600" : "text-red-500"
+                  isMatch ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"
                 }`}
               >
                 {isMatch
@@ -202,30 +208,34 @@ export default function Home() {
 
           {/* NAME */}
           <div>
-            <label className="text-sm text-gray-600">이름</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">이름</label>
             <input
               type="text"
               placeholder="이름 입력"
               value={name}
               onChange={saveName}
               required
-              className="w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
-                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+              className="w-full px-3 py-2 border border-rose-200 dark:border-gray-600 rounded-lg
+                     bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                     placeholder-gray-400 dark:placeholder-gray-500
+                     focus:outline-none focus:ring-2 focus:ring-rose-300
                      transition-all duration-200"
             />
           </div>
 
           {/* EMAIL */}
           <div>
-            <label className="text-sm text-gray-600">이메일</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">이메일</label>
             <input
               type="email"
               placeholder="example@email.com"
               value={email}
               onChange={saveEmail}
               required
-              className="w-full px-3 py-2 border border-rose-200 rounded-lg bg-white 
-                     focus:outline-none focus:ring-2 focus:ring-rose-300 
+              className="w-full px-3 py-2 border border-rose-200 dark:border-gray-600 rounded-lg
+                     bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                     placeholder-gray-400 dark:placeholder-gray-500
+                     focus:outline-none focus:ring-2 focus:ring-rose-300
                      transition-all duration-200"
             />
           </div>
@@ -234,8 +244,8 @@ export default function Home() {
           <button
             type="button"
             onClick={onSignUp}
-            className="w-full bg-gradient-to-r from-rose-300 to-orange-300 
-                   hover:from-rose-400 hover:to-orange-400 
+            className="w-full bg-gradient-to-r from-rose-300 to-orange-300
+                   hover:from-rose-400 hover:to-orange-400
                    text-white font-semibold rounded-xl py-2 mt-2
                    shadow-md transition-all duration-300"
           >
@@ -244,9 +254,9 @@ export default function Home() {
         </form>
 
         {/* LOGIN 이동 */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
           이미 계정이 있으신가요?{" "}
-          <Link to="/login" className="text-indigo-600 font-medium">
+          <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-medium">
             로그인
           </Link>
         </p>
