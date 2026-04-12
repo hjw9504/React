@@ -1,6 +1,5 @@
-import {Link, Navigate, useNavigate} from "react-router-dom";
-import {Button} from "@material-tailwind/react";
-import {useEffect, useLayoutEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {useState} from "react";
 
 export default function Home() {
   const [userId, setUserId] = useState("");
@@ -9,36 +8,90 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isChecked, setIsChecked] = useState(false);
+
+  // 이메일 인증
+  const [emailVerifyToken, setEmailVerifyToken] = useState("");
+  const [authCode, setAuthCode] = useState("");
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const navigate = useNavigate();
   const isMatch = userPw !== "" && userPwCheck !== "" && userPw === userPwCheck;
 
-  useLayoutEffect(() => {}, []);
-
-  useEffect(() => {});
-
-  const onHandleData = (response: any) => {
-    alert("Register Success!");
-    navigate("/login");
-  };
-
-  const saveUserId = (event: any) => {
-    setUserId(event.target.value);
-  };
-
-  const saveUserPw = (event: any) => {
-    setUserPw(event.target.value);
-  };
-
-  const saveUserPwCheck = (event: any) => {
-    setUserPwCheck(event.target.value);
-  };
-
-  const saveName = (event: any) => {
-    setName(event.target.value);
-  };
-
+  const saveUserId = (event: any) => setUserId(event.target.value);
+  const saveUserPw = (event: any) => setUserPw(event.target.value);
+  const saveUserPwCheck = (event: any) => setUserPwCheck(event.target.value);
+  const saveName = (event: any) => setName(event.target.value);
   const saveEmail = (event: any) => {
     setEmail(event.target.value);
+    // 이메일 변경 시 인증 초기화
+    setEmailSent(false);
+    setIsEmailVerified(false);
+    setEmailVerifyToken("");
+    setAuthCode("");
+    setEmailError("");
+  };
+
+  const requestEmailCode = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setEmailError("올바른 이메일 주소를 입력해주세요.");
+      return;
+    }
+    setIsSending(true);
+    setEmailError("");
+    try {
+      const res = await fetch("/api/email/auth/code", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email}),
+      });
+      const data = await res.json();
+      if (data.error_code === 0) {
+        setEmailVerifyToken(data.result_data.email_verify_token);
+        setEmailSent(true);
+      } else {
+        setEmailError("인증 코드 발송에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch {
+      setEmailError("네트워크 오류가 발생했습니다.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const verifyEmailCode = async () => {
+    if (!authCode.trim()) {
+      setEmailError("인증 코드를 입력해주세요.");
+      return;
+    }
+    setIsVerifying(true);
+    setEmailError("");
+    try {
+      const res = await fetch("/api/email/verify/code", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          email,
+          email_verify_token: emailVerifyToken,
+          auth_code: authCode,
+        }),
+      });
+      const data = await res.json();
+      if (data.error_code === 0) {
+        setIsEmailVerified(true);
+        setEmailError("");
+      } else {
+        setEmailError("인증 코드가 올바르지 않습니다.");
+      }
+    } catch {
+      setEmailError("네트워크 오류가 발생했습니다.");
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const checkUserId = async () => {
@@ -82,8 +135,13 @@ export default function Home() {
         return;
       }
 
-      if (userPw != userPwCheck) {
+      if (userPw !== userPwCheck) {
         alert("비밀번호를 다시 확인해주세요!");
+        return;
+      }
+
+      if (!isEmailVerified) {
+        alert("이메일 인증을 완료해주세요!");
         return;
       }
 
@@ -103,7 +161,8 @@ export default function Home() {
         .then((res) => res.json())
         .then((res) => {
           if (res.result_data === "success") {
-            onHandleData(res);
+            alert("Register Success!");
+            navigate("/login");
           } else {
             alert("회원가입 실패하였습니다.");
           }
@@ -238,18 +297,78 @@ export default function Home() {
             <label className="text-sm text-gray-600 dark:text-gray-400">
               이메일
             </label>
-            <input
-              type="email"
-              placeholder="example@email.com"
-              value={email}
-              onChange={saveEmail}
-              required
-              className="w-full px-3 py-2 border border-rose-200 dark:border-gray-600 rounded-lg
-                     bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
-                     placeholder-gray-400 dark:placeholder-gray-500
-                     focus:outline-none focus:ring-2 focus:ring-rose-300
-                     transition-all duration-200"
-            />
+            <div className="flex gap-2 mt-1">
+              <input
+                type="email"
+                placeholder="example@email.com"
+                value={email}
+                onChange={saveEmail}
+                disabled={isEmailVerified}
+                required
+                className="flex-1 px-3 py-2 border border-rose-200 dark:border-gray-600 rounded-lg
+                       bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                       placeholder-gray-400 dark:placeholder-gray-500
+                       focus:outline-none focus:ring-2 focus:ring-rose-300
+                       disabled:opacity-60 transition-all duration-200"
+              />
+              <button
+                type="button"
+                onClick={requestEmailCode}
+                disabled={isEmailVerified || isSending}
+                className="w-24 bg-gradient-to-r from-rose-300 to-orange-300
+                       hover:from-rose-400 hover:to-orange-400
+                       text-white text-sm font-semibold rounded-lg py-2 shadow-md
+                       disabled:opacity-50 transition-all duration-300"
+              >
+                {isSending ? "발송 중..." : emailSent ? "재발송" : "인증 요청"}
+              </button>
+            </div>
+
+            {/* 인증 코드 입력 */}
+            {emailSent && !isEmailVerified && (
+              <div className="mt-2 space-y-1">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="인증 코드 6자리 입력"
+                    value={authCode}
+                    onChange={(e) => { setAuthCode(e.target.value); setEmailError(""); }}
+                    maxLength={10}
+                    className="flex-1 px-3 py-2 border border-indigo-200 dark:border-gray-600 rounded-lg
+                           bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                           placeholder-gray-400 dark:placeholder-gray-500
+                           focus:outline-none focus:ring-2 focus:ring-indigo-300
+                           transition-all duration-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={verifyEmailCode}
+                    disabled={isVerifying || !authCode.trim()}
+                    className="w-24 bg-gradient-to-r from-indigo-400 to-violet-400
+                           hover:from-indigo-500 hover:to-violet-500
+                           text-white text-sm font-semibold rounded-lg py-2 shadow-md
+                           disabled:opacity-50 transition-all duration-300"
+                  >
+                    {isVerifying ? "확인 중..." : "인증 확인"}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  입력하신 이메일로 인증 코드가 발송되었습니다.
+                </p>
+              </div>
+            )}
+
+            {/* 인증 완료 */}
+            {isEmailVerified && (
+              <p className="mt-1.5 text-xs text-green-600 dark:text-green-400 font-medium">
+                ✓ 이메일 인증이 완료되었습니다.
+              </p>
+            )}
+
+            {/* 에러 메시지 */}
+            {emailError && (
+              <p className="mt-1.5 text-xs text-red-500 dark:text-red-400">{emailError}</p>
+            )}
           </div>
 
           {/* REGISTER BUTTON */}
