@@ -19,7 +19,7 @@ export default function ResetPassword() {
       return;
     }
 
-    const res = await fetch(`/api/check/userId?user_id=${userId}`, {
+    const res = await fetch(`/api/user/check/userId?user_id=${userId}`, {
       headers: {"Content-Type": "application/json"},
     });
     const data = await res.json();
@@ -51,7 +51,7 @@ export default function ResetPassword() {
       new_user_pw: newPassword,
     };
 
-    const res = await fetch(`/api/reset/password`, {
+    const res = await fetch(`/api/user/reset/password`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(body),
@@ -86,7 +86,9 @@ export default function ResetPassword() {
 
         {/* ID 영역 */}
         <div className="mb-5">
-          <label className="text-sm text-gray-700 dark:text-gray-300 font-medium">ID</label>
+          <label className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+            ID
+          </label>
           <div className="flex gap-2 mt-2">
             <input
               type="text"

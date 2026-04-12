@@ -7,7 +7,7 @@ const REFRESH_MARGIN_MS = 5 * 60 * 1000; // 만료 5분 전 refresh
 function getJwtExp(token: string): number | null {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.exp * 1000; // ms
+    return payload.exp * 1000;
   } catch {
     return null;
   }

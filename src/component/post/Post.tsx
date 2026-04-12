@@ -15,7 +15,7 @@ export async function postLoader() {
     }
   );
   const data = await res.json();
-  return {profileImage: data.result_data?.[0]?.profileImage || ""};
+  return {profileImage: data.result_data?.[0]?.profile_image || ""};
 }
 
 export default function Post() {

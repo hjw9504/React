@@ -2,17 +2,25 @@ import {useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import cookie from "react-cookies";
 
+type Step = "terms" | "profile";
+
 export default function Terms() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const fromIdp = searchParams.get("from") === "idp";
 
+  const [step, setStep] = useState<Step>("terms");
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [agreeAge, setAgreeAge] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // 프로필 입력 (IDP 전용)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [profileError, setProfileError] = useState("");
 
   const canProceed = agreeService && agreePrivacy && agreeAge;
 
@@ -39,50 +47,70 @@ export default function Terms() {
     cookie.save(cookieName, cookieValue, {path: "/", expires});
   };
 
-  const handleProceed = async () => {
+  // 약관 동의 완료
+  const handleProceed = () => {
     if (!canProceed) return;
-
     if (fromIdp) {
-      // IDP 회원가입 처리
-      const stored = sessionStorage.getItem("idp_pending");
-      if (!stored) {
-        navigate("/login");
-        return;
-      }
-      const {idp_token, idpType} = JSON.parse(stored);
-      setIsProcessing(true);
-
-      const body = JSON.stringify({idpType, idp_token});
-      const headers = {"Content-Type": "application/json"};
-
-      try {
-        await fetch(`/api/user/idp/register`, {method: "POST", headers, body});
-
-        const loginRes = await fetch(`/api/user/idp/login`, {
-          method: "POST",
-          headers,
-          body,
-        });
-        const loginData = await loginRes.json();
-
-        if (loginData.error_code === 0) {
-          const user = loginData.result_data;
-          setCookie("accessToken", user.access_token);
-          setCookie("refreshToken", user.refresh_token);
-          setCookie("name", user.name);
-          setCookie("memberId", user.member_id);
-          setCookie("role", user.role);
-          setCookie("userId", user.user_id);
-          sessionStorage.removeItem("idp_pending");
-          window.location.href = "/mypage";
-        } else {
-          navigate("/login");
-        }
-      } catch {
-        navigate("/login");
-      }
+      setStep("profile");
     } else {
       navigate("/register");
+    }
+  };
+
+  // IDP 프로필 입력 후 회원가입 + 로그인
+  const handleProfileSubmit = async () => {
+    if (!name.trim() || !email.trim()) {
+      setProfileError("이름과 이메일을 모두 입력해주세요.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setProfileError("올바른 이메일 형식을 입력해주세요.");
+      return;
+    }
+
+    const stored = sessionStorage.getItem("idp_pending");
+    if (!stored) {
+      navigate("/login");
+      return;
+    }
+    const {idp_token, idpType} = JSON.parse(stored);
+    setIsProcessing(true);
+    setProfileError("");
+
+    const headers = {"Content-Type": "application/json"};
+
+    try {
+      await fetch(`/api/user/idp/register`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({idpType, idp_token, name: name.trim(), email: email.trim()}),
+      });
+
+      const loginRes = await fetch(`/api/user/idp/login`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({idpType, idp_token}),
+      });
+      const loginData = await loginRes.json();
+
+      if (loginData.error_code === 0) {
+        const user = loginData.result_data;
+        setCookie("accessToken", user.access_token);
+        setCookie("refreshToken", user.refresh_token);
+        setCookie("name", user.name);
+        setCookie("memberId", user.member_id);
+        setCookie("role", user.role);
+        setCookie("userId", user.user_id);
+        sessionStorage.removeItem("idp_pending");
+        window.location.href = "/mypage";
+      } else {
+        setProfileError("회원가입에 실패했습니다. 다시 시도해주세요.");
+        setIsProcessing(false);
+      }
+    } catch {
+      setProfileError("오류가 발생했습니다. 다시 시도해주세요.");
+      setIsProcessing(false);
     }
   };
 
@@ -144,15 +172,173 @@ export default function Terms() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+
+        {/* ── 스텝 인디케이터 (IDP 전용) ── */}
+        {fromIdp && (
+          <div className="flex px-6 pt-5 gap-2">
+            {["약관 동의", "정보 입력"].map((label, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
+                  ${i === (step === "terms" ? 0 : 1)
+                    ? "bg-gradient-to-br from-orange-400 to-rose-500 text-white shadow-md"
+                    : i < (step === "terms" ? 0 : 1)
+                    ? "bg-green-400 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-400"}`}>
+                  {i < (step === "terms" ? 0 : 1) ? "✓" : i + 1}
+                </div>
+                <span className={`text-xs font-medium ${i === (step === "terms" ? 0 : 1) ? "text-orange-500" : "text-gray-400 dark:text-gray-500"}`}>
+                  {label}
+                </span>
+              </div>
+            ))}
+            <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-16 h-0.5 bg-gray-200 dark:bg-gray-700 hidden" />
+          </div>
+        )}
+
         {/* 헤더 */}
-        <div className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-400 px-6 py-5">
-          <h1 className="text-xl font-extrabold text-white">서비스 이용약관</h1>
+        <div className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-400 px-6 py-5 mt-3">
+          <h1 className="text-xl font-extrabold text-white">
+            {step === "profile" ? "프로필 설정" : "서비스 이용약관"}
+          </h1>
           <p className="text-sm text-white/80 mt-1">
-            {fromIdp ? "카카오 계정으로 가입하기 전" : "회원가입 전"} 약관에
-            동의해주세요
+            {step === "profile"
+              ? "서비스 이용을 위해 정보를 입력해주세요"
+              : fromIdp ? "카카오 계정으로 가입하기 전 약관에 동의해주세요"
+              : "회원가입 전 약관에 동의해주세요"}
           </p>
         </div>
 
+        {/* ── 프로필 입력 스텝 ── */}
+        {step === "profile" && (() => {
+          const stored = sessionStorage.getItem("idp_pending");
+          const idpType = stored ? JSON.parse(stored).idpType : "kakao";
+          const isNaver = idpType === "naver";
+          const isGoogle = idpType === "google";
+          const providerLabel = isNaver ? "네이버" : isGoogle ? "구글" : "카카오";
+          return (
+          <div className="p-6 space-y-5">
+            {/* 소셜 배너 */}
+            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${
+              isNaver
+                ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700"
+                : isGoogle
+                ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700"
+                : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700"
+            }`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border ${
+                isNaver ? "bg-[#03C75A] border-transparent"
+                : isGoogle ? "bg-white border-gray-200"
+                : "bg-yellow-400 border-transparent"
+              }`}>
+                {isNaver ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" />
+                  </svg>
+                ) : isGoogle ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#000000">
+                    <path d="M12 3C6.477 3 2 6.597 2 11c0 2.775 1.638 5.206 4.1 6.652l-.9 3.568a.3.3 0 0 0 .462.322l4.347-2.903C10.63 18.877 11.307 19 12 19c5.523 0 10-3.597 10-8S17.523 3 12 3z" />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  {providerLabel} 계정으로 가입
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">아래 정보를 입력하면 가입이 완료됩니다</p>
+              </div>
+            </div>
+
+            {/* 이름 */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                이름 <span className="text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setProfileError(""); }}
+                placeholder="실명을 입력해주세요"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600
+                           bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                           placeholder-gray-400 dark:placeholder-gray-500
+                           focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent
+                           transition-all duration-200"
+              />
+            </div>
+
+            {/* 이메일 */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                이메일 <span className="text-rose-400">*</span>
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); setProfileError(""); }}
+                placeholder="example@email.com"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600
+                           bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                           placeholder-gray-400 dark:placeholder-gray-500
+                           focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent
+                           transition-all duration-200"
+              />
+            </div>
+
+            {/* 에러 메시지 */}
+            {profileError && (
+              <div className="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <p className="text-sm text-red-600 dark:text-red-400">{profileError}</p>
+              </div>
+            )}
+
+            {/* 버튼 */}
+            <div className="flex gap-3 pt-1">
+              <button
+                onClick={() => setStep("terms")}
+                disabled={isProcessing}
+                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-600
+                           text-gray-600 dark:text-gray-300 font-semibold text-sm
+                           hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200
+                           disabled:opacity-50"
+              >
+                ← 이전
+              </button>
+              <button
+                onClick={handleProfileSubmit}
+                disabled={isProcessing || !name.trim() || !email.trim()}
+                className="flex-1 py-3 rounded-xl font-bold text-sm text-white
+                           bg-gradient-to-r from-orange-400 to-rose-400
+                           hover:from-orange-500 hover:to-rose-500
+                           shadow-md transition-all duration-200
+                           disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                    </svg>
+                    가입 중...
+                  </span>
+                ) : "가입 완료 →"}
+              </button>
+            </div>
+          </div>
+          );
+        })()}
+
+        {/* ── 약관 동의 스텝 ── */}
+        {step === "terms" && (
         <div className="p-6 space-y-4">
           {/* 전체 동의 */}
           <label className="flex items-center gap-3 p-4 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 cursor-pointer">
@@ -243,6 +429,7 @@ export default function Terms() {
             취소하고 돌아가기
           </button>
         </div>
+        )}
       </div>
     </div>
   );

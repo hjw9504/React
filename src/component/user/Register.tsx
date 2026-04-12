@@ -47,7 +47,7 @@ export default function Home() {
       return;
     }
 
-    await fetch(`/api/check/userId?user_id=${userId}`, {
+    await fetch(`/api/user/check/userId?user_id=${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +127,9 @@ export default function Home() {
         <form className="space-y-4">
           {/* USER ID */}
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400">아이디</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">
+              아이디
+            </label>
             <div className="flex gap-2 mt-1">
               <input
                 type="text"
@@ -157,7 +159,9 @@ export default function Home() {
 
           {/* PASSWORD */}
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400">비밀번호</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">
+              비밀번호
+            </label>
             <input
               type="password"
               placeholder="비밀번호 입력"
@@ -174,7 +178,9 @@ export default function Home() {
 
           {/* PASSWORD CHECK */}
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400">비밀번호 체크</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">
+              비밀번호 체크
+            </label>
             <input
               type="password"
               placeholder="비밀번호 입력"
@@ -196,7 +202,9 @@ export default function Home() {
             {userPwCheck !== "" && (
               <p
                 className={`text-xs mt-1 ${
-                  isMatch ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"
+                  isMatch
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-500 dark:text-red-400"
                 }`}
               >
                 {isMatch
@@ -208,7 +216,9 @@ export default function Home() {
 
           {/* NAME */}
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400">이름</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">
+              이름
+            </label>
             <input
               type="text"
               placeholder="이름 입력"
@@ -225,7 +235,9 @@ export default function Home() {
 
           {/* EMAIL */}
           <div>
-            <label className="text-sm text-gray-600 dark:text-gray-400">이메일</label>
+            <label className="text-sm text-gray-600 dark:text-gray-400">
+              이메일
+            </label>
             <input
               type="email"
               placeholder="example@email.com"
@@ -256,7 +268,10 @@ export default function Home() {
         {/* LOGIN 이동 */}
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
           이미 계정이 있으신가요?{" "}
-          <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-medium">
+          <Link
+            to="/login"
+            className="text-indigo-600 dark:text-indigo-400 font-medium"
+          >
             로그인
           </Link>
         </p>

@@ -18,16 +18,13 @@ interface User {
 export async function myInfoLoader() {
   const accessToken = cookie.load("accessToken") ?? "";
   const memberId = cookie.load("memberId") ?? "";
-  const res = await fetch(
-    `/api/user/info?member_id=${memberId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+  const res = await fetch(`/api/user/info?member_id=${memberId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
   const data = await res.json();
   return {user: data.result_data?.[0] || null};
 }
@@ -71,7 +68,7 @@ export default function Home() {
         user_id: cookie.load("userId"),
         nickname: nickName,
       };
-      const res = await fetch(`/api/update/nickname`, {
+      const res = await fetch(`/api/user/update/nickname`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
